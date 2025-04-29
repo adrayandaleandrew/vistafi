@@ -3,11 +3,13 @@ import { BudgetItem, BudgetCategory } from "../types/budget";
 interface BudgetItemListProps {
   items: BudgetItem[];
   onDeleteItem: (id: string) => void;
+  onEditItem?: (item: BudgetItem) => void;
 }
 
 export const BudgetItemList = ({
   items,
   onDeleteItem,
+  onEditItem,
 }: BudgetItemListProps) => {
   const getCategoryStyle = (category: BudgetCategory): string => {
     switch (category) {
@@ -29,7 +31,7 @@ export const BudgetItemList = ({
         <div className="col-span-2">Category</div>
         <div className="col-span-2">Amount</div>
         <div className="col-span-3">Date</div>
-        <div className="col-span-1">Action</div>
+        <div className="col-span-1 text-center">Action</div>
       </div>
       <ul className="divide-y divide-gray-200">
         {items.map((item) => (
@@ -53,14 +55,29 @@ export const BudgetItemList = ({
             <div className="col-span-3 text-gray-500 text-sm">
               {new Date(item.date).toLocaleDateString()}
             </div>
-            <div className="col-span-1">
+            <div className="col-span-1 flex justify-center items-center gap-1">
               <button
-                onClick={() => onDeleteItem(item.id)}
-                className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
+                onClick={() => onEditItem && onEditItem(item)}
+                className="text-blue-500 hover:text-blue-700 p-0.5 rounded-full hover:bg-blue-50"
+                aria-label="Edit item"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => onDeleteItem(item.id)}
+                className="text-red-500 hover:text-red-700 p-0.5 rounded-full hover:bg-red-50"
+                aria-label="Delete item"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
