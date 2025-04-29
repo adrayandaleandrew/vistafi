@@ -9,6 +9,7 @@ import { calculateBudgetSummary } from "./utils/budgetUtils";
 
 function App() {
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(mockBudgetItems);
+  const [itemToEdit, setItemToEdit] = useState<BudgetItem | null>(null);
 
   const handleAddItem = (newItem: BudgetItem) => {
     setBudgetItems([...budgetItems, newItem]);
@@ -16,6 +17,18 @@ function App() {
 
   const handleDeleteItem = (id: string) => {
     setBudgetItems(budgetItems.filter((item) => item.id !== id));
+  };
+
+  const handleEditItem = (item: BudgetItem) => {
+    // For now, just log the item. In a real app, you'd open a modal or form to edit the item
+    console.log("Edit item:", item);
+    setItemToEdit(item);
+
+    // Here you could open a modal, update form values, etc.
+    // This is just a placeholder to demonstrate the edit functionality works
+    alert(
+      `Edit functionality not fully implemented. Would edit: ${item.description}`
+    );
   };
 
   const summary = calculateBudgetSummary(budgetItems);
@@ -40,6 +53,7 @@ function App() {
             <BudgetItemList
               items={budgetItems}
               onDeleteItem={handleDeleteItem}
+              onEditItem={handleEditItem}
             />
           </div>
         </div>
