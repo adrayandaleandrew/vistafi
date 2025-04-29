@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 /* Base styles for the app */
-/* body {
+body {
   @apply bg-gray-50 text-gray-900 min-h-screen;
-} */
+}
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
