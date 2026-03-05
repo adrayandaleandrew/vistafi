@@ -50,4 +50,4 @@ export const mockBudgetItems: BudgetItem[] = [
         category: 'savings',
         date: '2023-11-02'
     }
-]; 
+];

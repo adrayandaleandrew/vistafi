@@ -1,131 +1,122 @@
 import { useState } from "react";
-import { BudgetCategory, BudgetItem } from "../types/budget";
-import { generateId } from "../utils/budgetUtils";
+import { BudgetCategory, BudgetItem } from "@shared/types/budget";
+import { generateId } from "@shared/utils/budgetUtils";
 
 interface BudgetFormProps {
   onAddItem: (item: BudgetItem) => void;
 }
 
 export const BudgetForm = ({ onAddItem }: BudgetFormProps) => {
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [type, setType] = useState<"expense" | "income">("expense");
-  const [category, setCategory] = useState<BudgetCategory>("expense");
-  const [date] = useState(new Date().toISOString().split("T")[0]);
+  const [type, setType] = useState<'income' | 'expense'>('expense');
+  const [expenseCategory, setExpenseCategory] = useState<'expense' | 'savings'>('expense');
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!description.trim() || !amount.trim() || parseFloat(amount) <= 0) return;
 
-    if (!description.trim() || !amount.trim()) {
-      return;
-    }
-
+    const category: BudgetCategory = type === 'income' ? 'income' : expenseCategory;
     const newItem: BudgetItem = {
       id: generateId(),
       description: description.trim(),
       amount: parseFloat(amount),
-      category: type === "income" ? "income" : category,
-      date,
+      category,
+      date: new Date().toISOString().split('T')[0],
     };
 
     onAddItem(newItem);
-
-    // Reset form
-    setDescription("");
-    setAmount("");
-    setType("expense");
-    setCategory("expense");
+    setDescription('');
+    setAmount('');
+    setType('expense');
+    setExpenseCategory('expense');
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm"
-    >
-      <h2 className="text-xl font-semibold mb-6">Quick Add</h2>
+    <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-xl p-6">
+      <h2 className="text-base font-semibold text-ink mb-6">Quick Add</h2>
 
+      {/* Type segmented control */}
       <div className="mb-5">
-        <label className="block text-gray-700 font-medium mb-2">Type</label>
-        <div className="flex gap-6">
-          <label className="flex items-center">
-            <input
-              type="radio"
-              className="w-5 h-5 text-indigo-600 focus:ring-indigo-500"
-              checked={type === "expense"}
-              onChange={() => setType("expense")}
-            />
-            <span className="ml-2">Expense</span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="radio"
-              className="w-5 h-5 text-indigo-600 focus:ring-indigo-500"
-              checked={type === "income"}
-              onChange={() => setType("income")}
-            />
-            <span className="ml-2">Income</span>
-          </label>
+        <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-muted mb-2">
+          Type
+        </label>
+        <div className="flex gap-2">
+          {(['income', 'expense'] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setType(t)}
+              className={`flex-1 h-9 rounded-lg text-sm font-medium cursor-pointer transition-colors duration-150 ${
+                type === t
+                  ? 'bg-ink text-surface'
+                  : 'border border-border text-muted hover:border-ink hover:text-ink'
+              }`}
+            >
+              {t === 'income' ? 'Income' : 'Expense'}
+            </button>
+          ))}
         </div>
       </div>
 
+      {/* Amount */}
       <div className="mb-5">
-        <label className="block text-gray-700 font-medium mb-2">Amount</label>
+        <label htmlFor="amount" className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-muted mb-2">
+          Amount
+        </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 text-lg">$</span>
-          </div>
+          <span className="absolute inset-y-0 left-3 flex items-center text-muted pointer-events-none">$</span>
           <input
+            id="amount"
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className="pl-8 pr-4 py-3 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
             step="0.01"
             min="0.01"
             required
+            className="w-full pl-8 pr-4 py-2.5 border border-border rounded-lg text-ink bg-transparent placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-ink num"
           />
         </div>
       </div>
 
-      <div className="mb-5">
-        <label className="block text-gray-700 font-medium mb-2">Category</label>
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value as BudgetCategory)}
-          className="w-full border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
-          disabled={type === "income"}
-          required
-        >
-          <option value="" disabled>
-            Select category
-          </option>
-          {type === "expense" && (
-            <>
-              <option value="expense">General Expense</option>
-              <option value="savings">Savings</option>
-            </>
-          )}
-          {type === "income" && <option value="income">Income</option>}
-        </select>
-      </div>
+      {/* Category — only when expense */}
+      {type === 'expense' && (
+        <div className="mb-5">
+          <label htmlFor="category" className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-muted mb-2">
+            Category
+          </label>
+          <select
+            id="category"
+            value={expenseCategory}
+            onChange={(e) => setExpenseCategory(e.target.value as 'expense' | 'savings')}
+            className="w-full py-2.5 px-3 border border-border rounded-lg text-ink bg-surface focus:outline-none focus:ring-1 focus:ring-ink cursor-pointer"
+          >
+            <option value="expense">General Expense</option>
+            <option value="savings">Savings</option>
+          </select>
+        </div>
+      )}
 
+      {/* Description */}
       <div className="mb-6">
-        <label className="block text-gray-700 font-medium mb-2">
+        <label htmlFor="description" className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-muted mb-2">
           Description
         </label>
         <input
+          id="description"
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="What's this for?"
-          className="w-full border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
           required
+          className="w-full py-2.5 px-3 border border-border rounded-lg text-ink bg-transparent placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-ink"
         />
       </div>
 
       <button
         type="submit"
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+        className="w-full min-h-[44px] bg-ink text-surface font-medium rounded-lg hover:opacity-90 cursor-pointer transition-opacity duration-150"
       >
         Add Transaction
       </button>
