@@ -13,4 +13,4 @@ export interface BudgetSummary {
     totalExpenses: number;
     totalSavings: number;
     balance: number;
-} 
+}
