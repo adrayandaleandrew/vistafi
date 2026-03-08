@@ -35,6 +35,8 @@ Before planning and throughout code changes, consult:
 | `react-native-best-practices` | RN performance — FPS/re-renders, bundle size, TTI, memory leaks; Measure→Optimize→Re-measure cycle |
 | `react-native-design` | RN styling — StyleSheet.create, React Navigation, Reanimated 3, Gesture Handler, platform-specific |
 | `vercel-react-native-skills` | RN/Expo patterns — FlashList, animation GPU properties, native navigators, expo-image, safe areas |
+| `better-auth-best-practices` | Auth setup (Phase 11+) — Better Auth server config, `createAuthClient`, session handling, `BETTER_AUTH_SECRET`/`BETTER_AUTH_URL` env vars; never `disableCSRFCheck` or `disableOriginCheck` |
+| `supabase-postgres-best-practices` | Database work (Phase 11+) — Supabase PostgreSQL schema, RLS (CRITICAL: every table), indexes on `user_id`, UUID PKs, connection pool singleton |
 
 #### Critical Rules (Apply to Every Task)
 - `rerender-functional-setstate` — always `setBudgetItems(curr => ...)`, never direct reference
