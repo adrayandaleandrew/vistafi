@@ -341,8 +341,8 @@ Close remaining post-Phase-8 audit gaps: test coverage, CI completeness, and ver
 
 ### Testing
 
-- [ ] Add component unit tests — BudgetForm, BudgetItemList, BudgetSummary, FilterBar, EditModal
-- [ ] Add integration tests — component interaction flows (add→list+summary, delete→list+summary, edit→list+summary)
+- [x] Add component unit tests — BudgetForm, BudgetItemList, BudgetSummary, FilterBar, EditModal
+- [x] Add integration tests — component interaction flows (add→list+summary, delete→list+summary, edit→list+summary)
 
 ### CI/CD
 
