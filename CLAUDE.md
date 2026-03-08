@@ -123,5 +123,5 @@ docs/                     # Project standards — read before every task
 - Strict TypeScript: `noUnusedLocals`, `noUnusedParameters`
 
 ## Open TODOs
-- Phases 1–10 complete (v1.0.0)
+- Phases 1–11 complete (v1.0.0)
 - Phase 10+ backlog: font change (S2 — replace Inter), mobile viewport E2E, CSV export, date picker on Quick Add, sort transactions, budget goals

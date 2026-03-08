@@ -417,46 +417,46 @@ automatically scopes every query to the signed-in user.
 
 ### 11.1 — Supabase Client Setup
 
-- [ ] Install `@supabase/supabase-js`
-- [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local` (anon key is safe to expose client-side — RLS enforces all access control)
-- [ ] Create `src/lib/supabase.ts` — Supabase client singleton (`createClient(url, anonKey)`)
-- [ ] Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as GitHub Actions secrets in CI
-- [ ] Add `.env.local` to `.gitignore` (verify — must never be committed)
+- [x] Install `@supabase/supabase-js`
+- [x] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local` (anon key is safe to expose client-side — RLS enforces all access control)
+- [x] Create `src/lib/supabase.ts` — Supabase client singleton (`createClient(url, anonKey)`)
+- [x] Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as GitHub Actions secrets in CI
+- [x] Add `.env.local` to `.gitignore` (verify — must never be committed)
 
 ### 11.2 — Supabase PostgreSQL Schema
 
-- [ ] Create `budget_items` table in Supabase SQL editor: `id` (uuid PK, `gen_random_uuid()`), `user_id` (uuid NOT NULL, references `auth.users(id)` ON DELETE CASCADE), `description` (text NOT NULL), `amount` (numeric(12,2) NOT NULL CHECK (amount > 0)), `category` (text NOT NULL CHECK (category IN ('income','expense','savings'))), `date` (date NOT NULL), `created_at` (timestamptz DEFAULT now())
-- [ ] Add index on `budget_items(user_id)` for query performance
-- [ ] Add index on `budget_items(user_id, date DESC)` for ordered list fetches
-- [ ] Write migration SQL file (version-controlled in `src/lib/migrations/`)
+- [x] Create `budget_items` table in Supabase SQL editor: `id` (uuid PK, `gen_random_uuid()`), `user_id` (uuid NOT NULL, references `auth.users(id)` ON DELETE CASCADE), `description` (text NOT NULL), `amount` (numeric(12,2) NOT NULL CHECK (amount > 0)), `category` (text NOT NULL CHECK (category IN ('income','expense','savings'))), `date` (date NOT NULL), `created_at` (timestamptz DEFAULT now())
+- [x] Add index on `budget_items(user_id)` for query performance
+- [x] Add index on `budget_items(user_id, date DESC)` for ordered list fetches
+- [x] Write migration SQL file (version-controlled in `src/lib/migrations/`)
 
 ### 11.3 — Row Level Security
 
-- [ ] Enable RLS on `budget_items` table
-- [ ] RLS policy SELECT: `user_id = auth.uid()`
-- [ ] RLS policy INSERT: `user_id = auth.uid()`
-- [ ] RLS policy UPDATE: `user_id = auth.uid()`
-- [ ] RLS policy DELETE: `user_id = auth.uid()`
-- [ ] Verify zero cross-user access in Supabase SQL editor (query as different user, expect 0 rows)
+- [x] Enable RLS on `budget_items` table
+- [x] RLS policy SELECT: `user_id = auth.uid()`
+- [x] RLS policy INSERT: `user_id = auth.uid()`
+- [x] RLS policy UPDATE: `user_id = auth.uid()`
+- [x] RLS policy DELETE: `user_id = auth.uid()`
+- [x] Verify zero cross-user access in Supabase SQL editor (query as different user, expect 0 rows)
 
 ### 11.4 — Data Service
 
 > TDD: write failing unit tests for each function BEFORE writing implementation.
 
-- [ ] Create `src/services/budgetService.ts`:
+- [x] Create `src/services/budgetService.ts`:
   - `fetchItems(): Promise<BudgetItem[]>` — Supabase `select` (RLS auto-scopes to signed-in user)
   - `addItem(item: Omit<BudgetItem, 'id'>): Promise<BudgetItem>` — Supabase `insert`
   - `updateItem(id: string, changes: Partial<BudgetItem>): Promise<BudgetItem>` — Supabase `update`
   - `deleteItem(id: string): Promise<void>` — Supabase `delete`
-- [ ] All functions use the shared Supabase client from `src/lib/supabase.ts` (no manual userId arg — RLS uses `auth.uid()` automatically)
-- [ ] All functions throw typed errors on failure
-- [ ] Write unit tests with Supabase client mocked
+- [x] All functions use the shared Supabase client from `src/lib/supabase.ts` (no manual userId arg — RLS uses `auth.uid()` automatically)
+- [x] All functions throw typed errors on failure
+- [x] Write unit tests with Supabase client mocked
 
 ### 11.5 — Supabase AuthContext (Web)
 
 > TDD: write failing tests before implementing.
 
-- [ ] Create `src/context/AuthContext.tsx`:
+- [x] Create `src/context/AuthContext.tsx`:
   - On mount: `supabase.auth.getSession()` to restore session from localStorage (Supabase handles this automatically)
   - `supabase.auth.onAuthStateChange` listener to keep `user` state in sync
   - `signIn`: calls `supabase.auth.signInWithPassword({ email, password })`
@@ -464,8 +464,8 @@ automatically scopes every query to the signed-in user.
   - `signOut`: calls `supabase.auth.signOut()`
   - `isLoading`: true while initial session is resolving
   - `error`: typed `AuthError | null` from Supabase responses
-- [ ] Wrap `src/main.tsx` with `<AuthProvider>`
-- [ ] Unit tests: sign in success sets user; sign in failure sets error; sign out clears user; session restored on mount
+- [x] Wrap `src/main.tsx` with `<AuthProvider>`
+- [x] Unit tests: sign in success sets user; sign in failure sets error; sign out clears user; session restored on mount
 
 ### 11.6 — Web Auth Screens
 
@@ -476,54 +476,54 @@ automatically scopes every query to the signed-in user.
 > the Warm Ledger palette. Do NOT use Inter as the display font for headings (use a characterful
 > pairing). Auth screens are the first impression — make them memorable.
 
-- [ ] Create `src/components/auth/LoginForm.tsx` (Readonly props interface):
+- [x] Create `src/components/auth/LoginForm.tsx` (Readonly props interface):
   - Email + password controlled inputs
   - Inline error from `AuthContext.error`
   - 44px min-height on all interactive elements (`ui-ux-pro-max`)
   - Visible focus rings on all inputs and buttons (`focus-visible:ring-2 focus-visible:ring-ink`)
   - "Create account" link
   - Validation: email format + password min 8 chars at form boundary
-- [ ] Create `src/components/auth/SignupForm.tsx` (Readonly props):
+- [x] Create `src/components/auth/SignupForm.tsx` (Readonly props):
   - Email, password, confirm password — all controlled
   - Passwords-match validation
   - "Already have an account?" link
-- [ ] Create `src/pages/LoginPage.tsx` and `src/pages/SignupPage.tsx`:
+- [x] Create `src/pages/LoginPage.tsx` and `src/pages/SignupPage.tsx`:
   - Distinctive typographic treatment (display font + body font pairing)
   - Warm Ledger tokens used throughout
   - VistaFi branding element
-- [ ] Wire routing: conditional render in `App.tsx` based on `AuthContext.user` (no external router needed unless already added)
-- [ ] Logic in hooks — no business logic directly in page components (`react-components` rule)
+- [x] Wire routing: conditional render in `App.tsx` based on `AuthContext.user` (no external router needed unless already added)
+- [x] Logic in hooks — no business logic directly in page components (`react-components` rule)
 
 ### 11.7 — Migrate `useBudget.ts`
 
 > TDD: update existing useBudget tests to expect service calls BEFORE modifying the hook.
 
-- [ ] Replace lazy `useState` from localStorage with async `fetchItems(userId)` call in `useEffect` on mount
-- [ ] Replace `handleAddItem` localStorage write with `addItem()` service call
-- [ ] Replace `handleSaveEdit` with `updateItem()` service call
-- [ ] Replace `handleDeleteItem` with `deleteItem()` service call
-- [ ] Remove localStorage `useEffect` sync entirely
-- [ ] Use `Promise.all` where multiple independent fetches are needed (`vercel-react-best-practices`: eliminate waterfalls)
-- [ ] All `setBudgetItems` calls use functional form `curr => ...` (`rerender-functional-setstate`)
-- [ ] Add `isLoading: boolean` and `dataError: string | null` to hook return
-- [ ] New users start with empty list — no mockData fallback for authenticated users
+- [x] Replace lazy `useState` from localStorage with async `fetchItems(userId)` call in `useEffect` on mount
+- [x] Replace `handleAddItem` localStorage write with `addItem()` service call
+- [x] Replace `handleSaveEdit` with `updateItem()` service call
+- [x] Replace `handleDeleteItem` with `deleteItem()` service call
+- [x] Remove localStorage `useEffect` sync entirely
+- [x] Use `Promise.all` where multiple independent fetches are needed (`vercel-react-best-practices`: eliminate waterfalls)
+- [x] All `setBudgetItems` calls use functional form `curr => ...` (`rerender-functional-setstate`)
+- [x] Add `isLoading: boolean` and `dataError: string | null` to hook return
+- [x] New users start with empty list — no mockData fallback for authenticated users
 
 ### 11.8 — Session Persistence + Route Protection
 
-- [ ] Loading state: show neutral spinner while `AuthContext.isLoading` is true (no auth UI flash)
-- [ ] Unauthenticated: render `<LoginPage />` instead of main app
-- [ ] Authenticated on auth page: redirect to main app
-- [ ] Sign out: clear query state, re-render to login screen
-- [ ] Session survives browser refresh (Supabase Auth persists session to localStorage automatically)
+- [x] Loading state: show neutral spinner while `AuthContext.isLoading` is true (no auth UI flash)
+- [x] Unauthenticated: render `<LoginPage />` instead of main app
+- [x] Authenticated on auth page: redirect to main app
+- [x] Sign out: clear query state, re-render to login screen
+- [x] Session survives browser refresh (Supabase Auth persists session to localStorage automatically)
 
 ### 11.9 — Error Handling
 
-- [ ] Network error on fetch: "Could not load transactions. Check your connection."
-- [ ] Wrong credentials: "Incorrect email or password."
-- [ ] Email not verified: "Please verify your email before signing in."
-- [ ] Email already in use: "An account with this email already exists."
-- [ ] Mutation error: non-blocking banner; no optimistic removal until confirmed
-- [ ] All error strings are user-facing — never raw exception messages
+- [x] Network error on fetch: "Could not load transactions. Check your connection."
+- [x] Wrong credentials: "Incorrect email or password."
+- [x] Email not verified: "Please verify your email before signing in."
+- [x] Email already in use: "An account with this email already exists."
+- [x] Mutation error: non-blocking banner; no optimistic removal until confirmed
+- [x] All error strings are user-facing — never raw exception messages
 
 ---
 
@@ -565,26 +565,21 @@ automatically scopes every query to the signed-in user.
 
 ---
 
-# PHASE 12 — EXPO MOBILE APP (iOS + ANDROID)
+# PHASE 12a — MOBILE FOUNDATION & AUTH
 
 ## Objective
 
-Build a native mobile app sharing the same Supabase PostgreSQL backend and Better Auth session
-system. Reuses `shared/` types and utils. Replaces the stub scaffold in `mobile/` with Expo
-Router, production deps, and fully functional screens.
+Working Expo Router app with Supabase Auth on iOS and Android simulators.
+Reuses `shared/` types and utils. Replaces the stub scaffold in `mobile/` with Expo Router,
+production deps, and fully functional auth flow using the same Supabase project as the web app.
 
 ---
 
 ## User Stories
 
 - As a mobile user, I want to log in with the same credentials as the web so I have one account everywhere
-- As a mobile user, I want to see my current balance and transaction history the moment I open the app
-- As a mobile user, I want to add a transaction with a few taps — logging feels frictionless
-- As a mobile user, I want to edit or delete transactions from a list with native gestures
-- As a mobile user, I want my data available offline so I can review my history without internet
-- As a mobile user, I want offline changes to sync automatically when I reconnect
-- As a mobile user, I want changes made on the web to appear on my phone in real time
-- As a mobile user, I want haptic feedback when actions complete so the app feels polished
+- As a mobile user, I want my session to persist across app restarts so I don't re-login every time
+- As a mobile user, I want route protection so I can't reach the budget screens without signing in
 
 ---
 
@@ -594,8 +589,8 @@ Router, production deps, and fully functional screens.
 
 - [ ] Remove legacy scaffold: `mobile/App.tsx`, `mobile/src/navigation/AppNavigator.tsx`
 - [ ] Install Expo Router + deps: `expo-router`, `expo-status-bar`, `react-native-safe-area-context`, `react-native-screens`
-- [ ] Install auth + storage: `expo-secure-store`, Better Auth mobile client (`better-auth/react`)
-- [ ] Install offline + data: `@tanstack/react-query`, `@tanstack/react-query-persist-client`, `@tanstack/query-async-storage-persister`, `@react-native-async-storage/async-storage`, `@react-native-community/netinfo`
+- [ ] Install auth + storage: `@supabase/supabase-js`, `@react-native-async-storage/async-storage`, `expo-secure-store`
+- [ ] Install offline + data: `@tanstack/react-query`, `@tanstack/react-query-persist-client`, `@tanstack/query-async-storage-persister`, `@react-native-community/netinfo`
 - [ ] Install UI/animation: `@shopify/flash-list`, `react-native-reanimated`, `react-native-gesture-handler`, `expo-haptics`, `expo-local-authentication` (optional biometrics)
 - [ ] Update `mobile/app.json`: `"main": "expo-router/entry"`, add `"scheme": "vistafi"`
 - [ ] Create `mobile/app/_layout.tsx` — root layout wrapping `<QueryProvider>`, `<AuthProvider>`, `<Stack>`
@@ -604,21 +599,21 @@ Router, production deps, and fully functional screens.
 - [ ] Add `@shared` path alias to `mobile/tsconfig.json` and `mobile/metro.config.js`
 - [ ] Verify `expo start` resolves all routes
 
-### 12.2 — Mobile AuthProvider
+### 12.2 — Mobile AuthProvider (TDD)
 
 > TDD: write failing tests before implementing.
 
+- [ ] Create `mobile/src/lib/supabase.ts` — Supabase singleton with AsyncStorage session adapter
 - [ ] Create `mobile/src/providers/AuthProvider.tsx`:
-  - Uses `expo-secure-store` for token storage (NEVER AsyncStorage for auth tokens — Security rule)
-  - Better Auth `createAuthClient` from `better-auth/react` pointing to web API URL
-  - On mount: read stored session token → validate via Better Auth `getSession()`
-  - On sign-in: `SecureStore.setItemAsync('auth_token', session.token)`
-  - On sign-out: `SecureStore.deleteItemAsync('auth_token')`
-  - Route protection via `useSegments` + `useRouter` (from `react-native-architecture` pattern)
+  - On mount: `supabase.auth.getSession()` to restore persisted session
+  - `supabase.auth.onAuthStateChange` listener to keep `user` state in sync
+  - `signIn`: `supabase.auth.signInWithPassword({ email, password })`
+  - `signUp`: `supabase.auth.signUp({ email, password })`
+  - `signOut`: `supabase.auth.signOut()`
+  - Route protection via `useSegments` + `useRouter`
   - Exports `useAuth()` hook
-- [ ] Create `mobile/src/lib/apiClient.ts` — HTTP client pointing to Better Auth server URL
 
-### 12.3 — React Query + Offline Provider
+### 12.3 — React Query + Offline Provider (TDD)
 
 > TDD: write failing tests for hooks before implementing.
 
@@ -635,7 +630,7 @@ Router, production deps, and fully functional screens.
   - All rollback on error; all `queryClient.invalidateQueries` on settle
   - All use `useCallback` for stable references
 
-### 12.4 — Auth Screens (Mobile)
+### 12.4 — Mobile Auth Screens (TDD)
 
 > TDD: write failing tests before implementing.
 
@@ -650,7 +645,59 @@ Router, production deps, and fully functional screens.
   - `SafeAreaView` wrapping the screen
 - [ ] Create `mobile/app/(auth)/signup.tsx` — same patterns; passwords-match validation
 
-### 12.5 — Dashboard Screen (Home Tab)
+---
+
+## Security Requirements (Phase 12a)
+
+- `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` in `mobile/.env` — not committed to git
+- `mobile/.env` in `.gitignore`
+- Supabase session tokens managed by `@supabase/supabase-js` with AsyncStorage adapter (standard RN pattern)
+- Never use the Supabase `service_role` key in mobile — same rule as web
+- No cross-user data access — same RLS policies from Phase 11 cover mobile API calls
+- No `console.log` of tokens, user IDs, or sensitive data
+- No hardcoded credentials in `mobile/` source
+
+---
+
+## Testing (Phase 12a)
+
+> TDD iron law applies to every task in 12.2–12.4.
+
+- Unit: `AuthProvider` (getSession on mount, onAuthStateChange, signIn/signUp/signOut, route protection); `useBudgetItems` (fetch, offline cache); `useAddItem`/`useDeleteItem`/`useUpdateItem` (optimistic update + rollback); login/signup screens (render, submit, validation, error)
+- Integration: auth flow → session persists → route protection → app renders
+
+---
+
+## Done Criteria (Phase 12a)
+
+1. Login/signup works on iOS Simulator and Android Emulator using same Supabase credentials as web
+2. Session persists across app restarts (AsyncStorage adapter)
+3. Route protection redirects unauthenticated users to login screen
+4. `expo start` resolves all routes without errors
+
+---
+
+# PHASE 12b — CORE BUDGET SCREENS
+
+## Objective
+
+Full CRUD for transactions on mobile. All screens share the same Supabase PostgreSQL backend
+as the web app.
+
+---
+
+## User Stories
+
+- As a mobile user, I want to see my current balance and transaction history the moment I open the app
+- As a mobile user, I want to add a transaction with a few taps — logging feels frictionless
+- As a mobile user, I want to edit or delete transactions from a list with native gestures
+- As a mobile user, I want my data available offline so I can review my history without internet
+
+---
+
+## Tasks
+
+### 12.5 — Dashboard Screen (Home Tab) (TDD)
 
 > TDD: write failing tests before implementing.
 
@@ -668,7 +715,7 @@ Router, production deps, and fully functional screens.
   - `SafeAreaView` or `useSafeAreaInsets` on all screens
   - All animations use only `transform` and `opacity` (GPU properties rule)
 
-### 12.6 — Add Transaction Screen (Add Tab)
+### 12.6 — Add Transaction Screen (Add Tab) (TDD)
 
 > TDD: write failing tests before implementing.
 
@@ -683,7 +730,7 @@ Router, production deps, and fully functional screens.
   - On success: `router.replace('/(tabs)')` to Dashboard
   - All styles in `StyleSheet.create`
 
-### 12.7 — Transaction History Screen (History Tab)
+### 12.7 — History + Edit (History Tab) (TDD)
 
 - [ ] Create `mobile/app/(tabs)/history.tsx`:
   - Category filter pills (All / Income / Expense / Savings) as `Pressable` row
@@ -698,12 +745,50 @@ Router, production deps, and fully functional screens.
   - On save: `useUpdateItem`, `expo-haptics` success, dismiss modal
   - On cancel: dismiss without saving
 
-### 12.8 — Profile Screen (Profile Tab)
+---
+
+## Testing (Phase 12b)
+
+> TDD iron law applies to every task in 12.5–12.7.
+
+- Unit: all screens (render, submit, validation, error states, empty state); `TransactionItem` (render, memo)
+- Integration: add transaction → optimistic update → server confirm; offline add → reconnect → sync
+
+---
+
+## Done Criteria (Phase 12b)
+
+1. Authenticated user can view, add, edit, and delete transactions on mobile
+2. FlashList used for every transaction list — no FlatList or ScrollView wrapping lists
+3. Offline: cached transactions visible when network is unavailable
+4. All interactive elements meet 44pt minimum touch target
+
+---
+
+# PHASE 12c — POLISH, REALTIME & RELEASE
+
+## Objective
+
+Production-ready mobile app with realtime sync, performance targets met, and EAS build.
+
+---
+
+## User Stories
+
+- As a mobile user, I want offline changes to sync automatically when I reconnect
+- As a mobile user, I want changes made on the web to appear on my phone in real time
+- As a mobile user, I want haptic feedback when actions complete so the app feels polished
+
+---
+
+## Tasks
+
+### 12.8 — Profile Screen (Profile Tab) (TDD)
 
 - [ ] Create `mobile/app/(tabs)/profile.tsx`:
   - Display current user email
   - Sign out `Pressable` — `useAuth().signOut()`, `expo-haptics` light, redirect to `/(auth)/login`
-  - Optional biometrics: check `expo-local-authentication` hardware availability; if available, show "Enable Face ID / Fingerprint" toggle; store preference in `AsyncStorage` (not SecureStore — not a secret)
+  - Optional biometrics: check `expo-local-authentication` hardware availability; if available, show "Enable Face ID / Fingerprint" toggle; store preference in `AsyncStorage` (preference is not a secret)
 
 ### 12.9 — Supabase Realtime Sync
 
@@ -733,7 +818,7 @@ Router, production deps, and fully functional screens.
   - `development`: `developmentClient: true`, iOS simulator enabled
   - `preview`: `distribution: 'internal'`, Android APK
   - `production`: `autoIncrement: true`
-- [ ] Add `EXPO_PUBLIC_API_URL`, `BETTER_AUTH_URL` as GitHub Actions secrets
+- [ ] Add `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY` as GitHub Actions secrets
 - [ ] Create `.github/workflows/mobile-ci.yml`:
   - `npm ci` in `mobile/` → lint → unit tests → EAS build `--profile preview --non-interactive`
   - Trigger: PR and push to master
@@ -741,42 +826,32 @@ Router, production deps, and fully functional screens.
 
 ---
 
-## Security Requirements (Phase 12)
+## Security Requirements (Phase 12c)
 
-- Auth tokens stored exclusively in `expo-secure-store` — never `AsyncStorage`
-- `EXPO_PUBLIC_API_URL` and other secrets in `mobile/.env` — not committed to git
-- `mobile/.env` in `.gitignore`
-- No cross-user data access — same RLS policies from Phase 11 cover mobile API calls
-- All form inputs validated at boundary before any mutation call
-- No `console.log` of tokens, user IDs, or sensitive data
+- All security rules from Phase 12a apply
 - Biometrics is opt-in — app fully functional without it
-- No hardcoded credentials in `mobile/` source
+- No `console.log` of tokens, user IDs, or sensitive data
+- EAS secrets injected via GitHub Actions secrets — no hardcoded values in workflow files
 
 ---
 
-## Testing (Phase 12)
+## Testing (Phase 12c)
 
-> TDD iron law applies to every task in 12.2–12.9.
+> TDD iron law applies to 12.8–12.9.
 
-- Unit: `AuthProvider` (SecureStore interactions); `useBudgetItems` (fetch, offline cache); `useAddItem`/`useDeleteItem`/`useUpdateItem` (optimistic update + rollback); all screens (render, submit, validation, error states)
-- Integration: auth flow → data load → Dashboard; add transaction → optimistic update → server confirm; offline add → re-connect → sync; Realtime event → list update
+- Unit: `ProfileScreen` (email display, sign out, biometrics toggle); Realtime subscription (subscribe on mount, invalidate on event, unsubscribe on unmount)
+- Integration: Realtime event → list update; sign out → redirect to login
 - E2E (Detox or Maestro): sign up → empty Dashboard; login → see transactions; add → appears in list; delete → removed; edit → updated; logout → login screen; offline → cached data visible
 
 ---
 
-## Acceptance Criteria (Phase 12)
+## Done Criteria (Phase 12c)
 
-1. App runs on iOS (Simulator) and Android (Emulator) via `expo start`
-2. Login with same credentials as web — same account, same data
-3. Dashboard shows correct balance fetched from Supabase
-4. Adding transaction on mobile appears on web (Realtime, within 5 seconds)
-5. Adding transaction on web appears on mobile (Realtime, within 5 seconds)
-6. Transactions accessible offline via React Query AsyncStorage cache
-7. FlashList used for all transaction lists — no FlatList or ScrollView wrapping lists
-8. All interactive elements meet 44pt minimum touch target
-9. Auth tokens in `expo-secure-store` only — never `AsyncStorage`
-10. EAS preview build produces installable APK/IPA
-11. Mobile CI runs lint + unit tests on every PR
+1. EAS preview build produces installable APK/IPA
+2. Adding transaction on mobile appears on web within 5 seconds (Realtime)
+3. Adding transaction on web appears on mobile within 5 seconds (Realtime)
+4. Mobile CI (lint + unit tests) passes on every PR
+5. All performance targets met: 60fps scroll, <2s TTI, <1.5MB bundle
 
 ---
 
