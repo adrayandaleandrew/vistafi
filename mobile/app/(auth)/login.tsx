@@ -1,0 +1,169 @@
+import React, { useState } from 'react'
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native'
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated'
+import * as Haptics from 'expo-haptics'
+import { useRouter } from 'expo-router'
+import { useAuth } from '../../src/providers/AuthProvider'
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
+
+export default function LoginScreen() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [validationError, setValidationError] = useState<string | null>(null)
+  const { signIn, error: authError } = useAuth()
+  const router = useRouter()
+  const scale = useSharedValue(1)
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }))
+
+  const handleSubmit = async () => {
+    setValidationError(null)
+    const emailTrimmed = email.trim()
+    if (!emailTrimmed || !emailTrimmed.includes('@')) {
+      setValidationError('Please enter a valid email address.')
+      return
+    }
+    if (password.length < 8) {
+      setValidationError('Password must be at least 8 characters.')
+      return
+    }
+    await signIn(emailTrimmed, password)
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+  }
+
+  const displayError = validationError ?? authError
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.title}>VistaFi</Text>
+        <Text style={styles.subtitle}>Sign in to your account</Text>
+
+        <TextInput
+          testID="email-input"
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Email"
+          placeholderTextColor="#857F72"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+
+        <TextInput
+          testID="password-input"
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Password"
+          placeholderTextColor="#857F72"
+          secureTextEntry
+        />
+
+        {displayError ? <Text style={styles.error}>{displayError}</Text> : null}
+
+        <AnimatedPressable
+          testID="submit-button"
+          style={[styles.submitButton, animatedStyle]}
+          onPressIn={() => { scale.value = withSpring(0.95) }}
+          onPressOut={() => { scale.value = withSpring(1) }}
+          onPress={handleSubmit}
+          accessibilityRole="button"
+          accessibilityLabel="Sign in"
+        >
+          <Text style={styles.submitText}>Sign In</Text>
+        </AnimatedPressable>
+
+        <Pressable
+          testID="create-account-button"
+          style={styles.linkButton}
+          onPress={() => router.push('/(auth)/signup')}
+          accessibilityRole="button"
+          accessibilityLabel="Create account"
+        >
+          <Text style={styles.linkText}>Create account</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
+  )
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F5F2EC',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 24,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#18170F',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#857F72',
+    marginBottom: 32,
+  },
+  input: {
+    backgroundColor: '#FDFCFA',
+    borderWidth: 1,
+    borderColor: '#E0DBCF',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: '#18170F',
+    marginBottom: 16,
+    minHeight: 44,
+  },
+  error: {
+    color: '#C1281A',
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  submitButton: {
+    backgroundColor: '#18170F',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
+    marginTop: 8,
+    cursor: 'pointer',
+  },
+  submitText: {
+    color: '#F5F2EC',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  linkButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
+    marginTop: 16,
+    cursor: 'pointer',
+  },
+  linkText: {
+    color: '#857F72',
+    fontSize: 14,
+  },
+})
