@@ -58,6 +58,28 @@ describe('EditModal', () => {
     expect(onCancel).toHaveBeenCalledOnce()
   })
 
+  it('should hide category dropdown when Income type is selected', async () => {
+    // Given — item with expense category
+    const item = makeItem({ category: 'expense' })
+    const user = userEvent.setup()
+    render(<EditModal item={item} onSave={vi.fn()} onCancel={vi.fn()} />)
+    // When — switch to Income
+    await user.click(screen.getByRole('button', { name: 'Income' }))
+    // Then — category dropdown hidden
+    expect(screen.queryByLabelText(/category/i)).not.toBeInTheDocument()
+  })
+
+  it('should show category dropdown when Expense type is selected', async () => {
+    // Given — item with income category
+    const item = makeItem({ category: 'income' })
+    const user = userEvent.setup()
+    render(<EditModal item={item} onSave={vi.fn()} onCancel={vi.fn()} />)
+    // When — switch to Expense
+    await user.click(screen.getByRole('button', { name: 'Expense' }))
+    // Then — category dropdown visible
+    expect(screen.getByLabelText(/category/i)).toBeInTheDocument()
+  })
+
   it('should call onSave with updated values when save button is clicked', async () => {
     // Given
     const onSave = vi.fn()

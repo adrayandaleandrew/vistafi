@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BudgetCategory, BudgetItem } from "@shared/types/budget";
 
 interface EditModalProps {
@@ -16,11 +16,37 @@ export const EditModal = ({ item, onSave, onCancel }: Readonly<EditModalProps>) 
   );
   const [amount, setAmount] = useState(item.amount.toString());
   const [description, setDescription] = useState(item.description);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const modal = modalRef.current;
+    if (!modal) return;
+
+    // Focus first focusable element on open
+    const getFocusable = () => Array.from(
+      modal.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+      )
+    );
+    getFocusable()[0]?.focus();
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCancel();
+      if (e.key === 'Escape') { onCancel(); return; }
+      if (e.key !== 'Tab') return;
+
+      const focusable = getFocusable();
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
     };
+
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onCancel]);
@@ -44,10 +70,14 @@ export const EditModal = ({ item, onSave, onCancel }: Readonly<EditModalProps>) 
 
       {/* Modal card */}
       <div
+        ref={modalRef}
         className="relative bg-surface border border-border rounded-xl p-6 w-full max-w-md mx-4 shadow-xl"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-modal-title"
       >
-        <h2 className="text-base font-semibold text-ink mb-6">Edit Transaction</h2>
+        <h2 id="edit-modal-title" className="text-base font-semibold text-ink mb-6">Edit Transaction</h2>
 
         <form onSubmit={handleSubmit}>
           {/* Type segmented control */}
@@ -61,7 +91,7 @@ export const EditModal = ({ item, onSave, onCancel }: Readonly<EditModalProps>) 
                   key={t}
                   type="button"
                   onClick={() => setType(t)}
-                  className={`flex-1 min-h-[44px] rounded-lg text-sm font-medium cursor-pointer transition-colors duration-150 ${
+                  className={`flex-1 min-h-[44px] rounded-lg text-sm font-medium cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1 ${
                     type === t
                       ? 'bg-ink text-surface'
                       : 'border border-border text-muted hover:border-ink hover:text-ink'
@@ -132,13 +162,13 @@ export const EditModal = ({ item, onSave, onCancel }: Readonly<EditModalProps>) 
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 min-h-[44px] border border-border text-muted rounded-lg font-medium hover:border-ink hover:text-ink cursor-pointer transition-colors duration-150"
+              className="flex-1 min-h-[44px] border border-border text-muted rounded-lg font-medium hover:border-ink hover:text-ink cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 min-h-[44px] bg-ink text-surface rounded-lg font-medium hover:opacity-90 cursor-pointer transition-opacity duration-150"
+              className="flex-1 min-h-[44px] bg-ink text-surface rounded-lg font-medium hover:opacity-90 cursor-pointer transition-opacity duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1"
             >
               Save Changes
             </button>
