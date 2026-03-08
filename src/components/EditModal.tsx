@@ -7,7 +7,7 @@ interface EditModalProps {
   onCancel: () => void;
 }
 
-export const EditModal = ({ item, onSave, onCancel }: EditModalProps) => {
+export const EditModal = ({ item, onSave, onCancel }: Readonly<EditModalProps>) => {
   const [type, setType] = useState<'income' | 'expense'>(
     item.category === 'income' ? 'income' : 'expense'
   );

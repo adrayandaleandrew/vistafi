@@ -78,19 +78,14 @@ Characteristics:
 
 # Branch Strategy
 
-main → production
-develop → staging
+master → production
 feature/* → development work
 
 ---
 
 ## Flow
 
-Feature Branch
-→ develop
-→ staging test
-→ merge to main
-→ production deploy
+Feature Branch → PR → master → deploy
 
 ---
 
@@ -114,7 +109,7 @@ Every push triggers CI.
 
 On:
 - Pull Requests
-- Push to develop/main
+- Push to master
 
 ---
 

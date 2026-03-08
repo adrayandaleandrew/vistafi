@@ -14,7 +14,7 @@ const filters: { label: string; value: BudgetCategory | 'all' }[] = [
   { label: 'Savings', value: 'savings' },
 ];
 
-export const FilterBar = ({ active, onChange, searchQuery, onSearchChange }: FilterBarProps) => {
+export const FilterBar = ({ active, onChange, searchQuery, onSearchChange }: Readonly<FilterBarProps>) => {
   return (
     <div className="flex justify-between gap-4 mb-4">
       <div className="flex gap-2">
