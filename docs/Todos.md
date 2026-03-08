@@ -382,7 +382,7 @@ Phases 1–10 merged and released as v1.0.0. See git history for full audit trai
 
 ## Objective
 
-Introduce Better Auth for user authentication and Supabase PostgreSQL for cloud data persistence.
+Introduce Supabase Auth for user authentication and Supabase PostgreSQL for cloud data persistence.
 Replace `localStorage` inside `useBudget.ts` with typed service calls. All existing web UI
 components, design tokens, and layout remain completely unchanged.
 
@@ -392,13 +392,13 @@ components, design tokens, and layout remain completely unchanged.
 
 | Layer | Technology |
 |-------|-----------|
-| Authentication | Better Auth (`better-auth`) |
+| Authentication | Supabase Auth (`@supabase/supabase-js`) |
 | Database | Supabase PostgreSQL |
 
-Better Auth handles sign-up, sign-in, sessions, and tokens via its own schema (`user`, `session`,
-`account`, `verification` tables in Supabase PostgreSQL using the Drizzle/Postgres adapter).
-Budget data lives in `budget_items` table in the same database. RLS policies on `budget_items`
-use `current_setting('app.current_user_id')` set at the application layer before each query.
+Supabase Auth handles sign-up, sign-in, sessions, and JWTs entirely client-side — no separate
+server needed. Budget data lives in the `budget_items` table in the same Supabase project.
+RLS policies on `budget_items` use `auth.uid()` (Supabase's native JWT claim) so the database
+automatically scopes every query to the signed-in user.
 
 ---
 
@@ -415,19 +415,17 @@ use `current_setting('app.current_user_id')` set at the application layer before
 
 ## Tasks
 
-### 11.1 — Better Auth Server Setup
+### 11.1 — Supabase Client Setup
 
-- [ ] Install `better-auth` + Supabase Postgres adapter (`better-auth/adapters/drizzle` or direct `pg`)
-- [ ] Set `BETTER_AUTH_SECRET` (min 32 chars, `openssl rand -base64 32`) and `BETTER_AUTH_URL` in `.env.local`
-- [ ] Create `src/lib/auth.ts` — Better Auth server config: `emailAndPassword: { enabled: true }`, `database` pointing to Supabase PostgreSQL connection string, `session.expiresIn` set
-- [ ] Create API route handler `src/api/auth/[...all].ts` (or Vite API equivalent)
-- [ ] Run `npx @better-auth/cli@latest migrate` to create Better Auth's `user`, `session`, `account`, `verification` tables in Supabase PostgreSQL
-- [ ] Set `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` as GitHub Actions secrets in CI
+- [ ] Install `@supabase/supabase-js`
+- [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local` (anon key is safe to expose client-side — RLS enforces all access control)
+- [ ] Create `src/lib/supabase.ts` — Supabase client singleton (`createClient(url, anonKey)`)
+- [ ] Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as GitHub Actions secrets in CI
+- [ ] Add `.env.local` to `.gitignore` (verify — must never be committed)
 
 ### 11.2 — Supabase PostgreSQL Schema
 
-- [ ] Connect to Supabase PostgreSQL database using connection string in `.env.local` (`DATABASE_URL`)
-- [ ] Create `budget_items` table: `id` (uuid PK, `gen_random_uuid()`), `user_id` (uuid NOT NULL, references Better Auth `user.id`), `description` (text NOT NULL), `amount` (numeric(12,2) NOT NULL CHECK > 0), `category` (text NOT NULL CHECK IN 'income'/'expense'/'savings'), `date` (date NOT NULL), `created_at` (timestamptz DEFAULT now())
+- [ ] Create `budget_items` table in Supabase SQL editor: `id` (uuid PK, `gen_random_uuid()`), `user_id` (uuid NOT NULL, references `auth.users(id)` ON DELETE CASCADE), `description` (text NOT NULL), `amount` (numeric(12,2) NOT NULL CHECK (amount > 0)), `category` (text NOT NULL CHECK (category IN ('income','expense','savings'))), `date` (date NOT NULL), `created_at` (timestamptz DEFAULT now())
 - [ ] Add index on `budget_items(user_id)` for query performance
 - [ ] Add index on `budget_items(user_id, date DESC)` for ordered list fetches
 - [ ] Write migration SQL file (version-controlled in `src/lib/migrations/`)
@@ -435,41 +433,39 @@ use `current_setting('app.current_user_id')` set at the application layer before
 ### 11.3 — Row Level Security
 
 - [ ] Enable RLS on `budget_items` table
-- [ ] RLS policy: SELECT `user_id = current_setting('app.current_user_id', true)::uuid`
-- [ ] RLS policy: INSERT same check
-- [ ] RLS policy: UPDATE same check
-- [ ] RLS policy: DELETE same check
-- [ ] All data queries set `app.current_user_id` from the Better Auth session before executing
-- [ ] Verify zero cross-user access in Supabase SQL editor
+- [ ] RLS policy SELECT: `user_id = auth.uid()`
+- [ ] RLS policy INSERT: `user_id = auth.uid()`
+- [ ] RLS policy UPDATE: `user_id = auth.uid()`
+- [ ] RLS policy DELETE: `user_id = auth.uid()`
+- [ ] Verify zero cross-user access in Supabase SQL editor (query as different user, expect 0 rows)
 
 ### 11.4 — Data Service
 
 > TDD: write failing unit tests for each function BEFORE writing implementation.
 
 - [ ] Create `src/services/budgetService.ts`:
-  - `fetchItems(userId: string): Promise<BudgetItem[]>`
-  - `addItem(item: Omit<BudgetItem, 'id'>, userId: string): Promise<BudgetItem>`
-  - `updateItem(id: string, changes: Partial<BudgetItem>, userId: string): Promise<BudgetItem>`
-  - `deleteItem(id: string, userId: string): Promise<void>`
-- [ ] All functions set `app.current_user_id` on the connection before executing queries (RLS integration)
+  - `fetchItems(): Promise<BudgetItem[]>` — Supabase `select` (RLS auto-scopes to signed-in user)
+  - `addItem(item: Omit<BudgetItem, 'id'>): Promise<BudgetItem>` — Supabase `insert`
+  - `updateItem(id: string, changes: Partial<BudgetItem>): Promise<BudgetItem>` — Supabase `update`
+  - `deleteItem(id: string): Promise<void>` — Supabase `delete`
+- [ ] All functions use the shared Supabase client from `src/lib/supabase.ts` (no manual userId arg — RLS uses `auth.uid()` automatically)
 - [ ] All functions throw typed errors on failure
-- [ ] Database connection uses connection pool singleton (`src/lib/db.ts`)
-- [ ] Write unit tests with DB mocked
+- [ ] Write unit tests with Supabase client mocked
 
-### 11.5 — Better Auth Client + AuthContext (Web)
+### 11.5 — Supabase AuthContext (Web)
 
 > TDD: write failing tests before implementing.
 
-- [ ] Create `src/lib/authClient.ts` — `createAuthClient` from `better-auth/react` pointing to the API handler
 - [ ] Create `src/context/AuthContext.tsx`:
-  - Uses Better Auth `useSession()` hook for session state
-  - `signIn`: calls `authClient.signIn.email({ email, password })`
-  - `signUp`: calls `authClient.signUp.email({ email, password, name })`
-  - `signOut`: calls `authClient.signOut()`
-  - `isLoading`: from `useSession().isPending`
-  - `error`: typed from Better Auth error responses
+  - On mount: `supabase.auth.getSession()` to restore session from localStorage (Supabase handles this automatically)
+  - `supabase.auth.onAuthStateChange` listener to keep `user` state in sync
+  - `signIn`: calls `supabase.auth.signInWithPassword({ email, password })`
+  - `signUp`: calls `supabase.auth.signUp({ email, password })`
+  - `signOut`: calls `supabase.auth.signOut()`
+  - `isLoading`: true while initial session is resolving
+  - `error`: typed `AuthError | null` from Supabase responses
 - [ ] Wrap `src/main.tsx` with `<AuthProvider>`
-- [ ] Unit tests: sign in success sets user; sign in failure sets error; sign out clears user; session restored from `useSession()`
+- [ ] Unit tests: sign in success sets user; sign in failure sets error; sign out clears user; session restored on mount
 
 ### 11.6 — Web Auth Screens
 
@@ -518,7 +514,7 @@ use `current_setting('app.current_user_id')` set at the application layer before
 - [ ] Unauthenticated: render `<LoginPage />` instead of main app
 - [ ] Authenticated on auth page: redirect to main app
 - [ ] Sign out: clear query state, re-render to login screen
-- [ ] Session survives browser refresh (Better Auth handles cookie persistence)
+- [ ] Session survives browser refresh (Supabase Auth persists session to localStorage automatically)
 
 ### 11.9 — Error Handling
 
@@ -533,15 +529,15 @@ use `current_setting('app.current_user_id')` set at the application layer before
 
 ## Security Requirements (Phase 11)
 
-- `BETTER_AUTH_SECRET` min 32 chars, never committed to git
-- `DATABASE_URL` (Supabase connection string) never committed to git
-- `disableCSRFCheck` and `disableOriginCheck` must NEVER be set (Better Auth security rules)
-- RLS enabled on `budget_items` — zero cross-user access
+- `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` never committed to git (`.env.local` in `.gitignore`)
+- Anon key is safe client-side — RLS is the security boundary, not the key
+- **Never use the Supabase `service_role` key client-side** — it bypasses RLS entirely
+- RLS enabled on `budget_items` — zero cross-user access via `auth.uid()`
 - All inputs validated at form boundary before any service call
-- Password minimum 8 characters (enforced client-side and in Better Auth `emailAndPassword` config)
+- Password minimum 8 characters (enforced client-side; Supabase Auth enforces server-side)
 - No `console.log` of tokens, user IDs, passwords, or session data
 - CI secrets inject env vars — no hardcoded values in workflow files
-- Staging and production are separate database connections (separate Supabase projects or schemas)
+- Staging and production use separate Supabase projects
 
 ---
 
@@ -549,7 +545,7 @@ use `current_setting('app.current_user_id')` set at the application layer before
 
 > Iron Law: failing test first. Every function, every component.
 
-- Unit: `budgetService` functions (mocked DB); `AuthContext` sign-in/up/out/restore; `LoginForm` render/validation/submit/error; `SignupForm` passwords-match; `useBudget` calls service on mount
+- Unit: `budgetService` functions (Supabase client mocked); `AuthContext` sign-in/up/out/restore; `LoginForm` render/validation/submit/error; `SignupForm` passwords-match; `useBudget` calls service on mount
 - Integration: login flow → data loads → app renders; add/edit/delete transaction persists; session survives mock refresh
 - E2E: sign up → empty dashboard; log in → see transactions; log out → login screen; refresh → session restored; add transaction → persists after refresh; wrong password → inline error
 
@@ -565,7 +561,7 @@ use `current_setting('app.current_user_id')` set at the application layer before
 6. No user can see another user's transactions (RLS enforced)
 7. Auth screens have a distinctive, memorable design — not generic SaaS
 8. All existing web UI components, colors, and layout are visually identical to pre-Phase-11
-9. CI pipeline passes with all secrets injected; no secrets in repository
+9. CI pipeline passes with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` injected as secrets; no env values in repository
 
 ---
 
