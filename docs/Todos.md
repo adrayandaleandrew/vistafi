@@ -346,7 +346,7 @@ Close remaining post-Phase-8 audit gaps: test coverage, CI completeness, and ver
 
 ### CI/CD
 
-- [ ] Add E2E tests to CI pipeline (requires preview server in CI)
+- [x] Add E2E tests to CI pipeline (requires preview server in CI)
 
 ### Release
 
