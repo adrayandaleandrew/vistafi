@@ -85,8 +85,12 @@ shared/
 tests/
   unit/
     budgetUtils.test.ts   # 14 Vitest unit tests
+    components/           # 26 component unit tests (jsdom)
+  integration/
+    budgetFlows.test.tsx  # 7 integration tests (full App)
   e2e/
     app.spec.ts           # 11 Playwright E2E tests
+  setup.ts                # jest-dom matchers + cleanup
 docs/                     # Project standards — read before every task
 .agents/skills/           # Coding skill library — reference during all work
 ```
@@ -101,17 +105,13 @@ docs/                     # Project standards — read before every task
 - `npm run build` — `tsc -b && vite build`
 - `npm run lint` — ESLint
 - `npm run preview` — preview production build
+- `npm run test:unit` — Vitest unit + integration tests
+- `npm run test:e2e` — Playwright E2E tests (requires build first)
 
 ## Config
 - Tailwind v4 via `@tailwindcss/vite` plugin (not PostCSS)
 - Strict TypeScript: `noUnusedLocals`, `noUnusedParameters`
 
-## Scripts
-- `npm run test:unit` — Vitest unit tests
-- `npm run test:e2e` — Playwright E2E tests (requires build first)
-
 ## Open TODOs
-- Phases 1–8 complete
-- Add E2E to CI pipeline (preview server in CI — Phase 9+)
-- Integration tests (component interactions — Phase 9+)
-- Version bump and production release checklist
+- Phases 1–9 complete
+- Version bump to 1.0.0 and production release checklist
