@@ -19,7 +19,33 @@ Never code on master directly.
 ### Step 2 — Read Docs and Skills During Planning and Implementation
 Before planning and throughout code changes, consult:
 - All files in `docs/` — standards, conventions, and task plan
-- `.agents/skills/` — coding best practices (most relevant: `vercel-react-best-practices`, `react-components`)
+- `.agents/skills/` — coding best practices; all skills are listed below with their scope
+
+#### Skill Index
+
+| Skill | When to Use |
+|-------|-------------|
+| `vercel-react-best-practices` | All React/Vite work — re-render rules, functional setState, ternary conditionals, bundle, waterfalls |
+| `test-driven-development` | Any new feature or bug fix — write failing test FIRST (Red-Green-Refactor); no production code without a failing test |
+| `testing-strategies` | Planning test coverage — test pyramid (unit 70 / integration 20 / E2E 10), Given-When-Then, AAA |
+| `ui-ux-pro-max` | Any UI/design work — accessibility (4.5:1 contrast, 44px touch targets, aria-labels), animation (150–300ms), layout, typography |
+| `frontend-design` | Creating or redesigning components/pages — bold aesthetic direction, avoid generic AI aesthetics, distinctive typography |
+| `react-components` | Stitch design→React conversion — modular files, logic in hooks, data in mockData, `Readonly` TypeScript interface |
+| `react-native-architecture` | Mobile (Expo/RN) — Expo Router, auth provider, offline-first React Query, native modules, EAS Build |
+| `react-native-best-practices` | RN performance — FPS/re-renders, bundle size, TTI, memory leaks; Measure→Optimize→Re-measure cycle |
+| `react-native-design` | RN styling — StyleSheet.create, React Navigation, Reanimated 3, Gesture Handler, platform-specific |
+| `vercel-react-native-skills` | RN/Expo patterns — FlashList, animation GPU properties, native navigators, expo-image, safe areas |
+
+#### Critical Rules (Apply to Every Task)
+- `rerender-functional-setstate` — always `setBudgetItems(curr => ...)`, never direct reference
+- `rendering-conditional-render` — ternary (`condition ? <X /> : null`), never `condition && <X />`
+- `js-cache-storage` — lazy `useState` init for localStorage, not `useEffect` on mount
+- **TDD iron law** — write failing test first; no production code without a prior failing test
+- `touch-target-size` — minimum 44×44px for all interactive elements
+- `aria-labels` — all icon-only buttons must have `aria-label`
+- No `console.log` in production or test code
+- No `dangerouslySetInnerHTML`
+- Controlled inputs only (`value` + `onChange`)
 
 ### Step 3 — Post-Implementation Compliance Check
 After all code changes are done, verify every change against:
@@ -68,9 +94,12 @@ docs/                     # Project standards — read before every task
 - Tailwind v4 via `@tailwindcss/vite` plugin (not PostCSS)
 - Strict TypeScript: `noUnusedLocals`, `noUnusedParameters`
 
+## Scripts
+- `npm run test:unit` — Vitest unit tests
+- `npm run test:e2e` — Playwright E2E tests (requires build first)
+
 ## Open TODOs
-- Edit transaction UI (Phase 4) — `handleEditItem` is a stub (`alert()` only)
-- Fix `index.css` Vite scaffold dark background conflicting with Tailwind
-- Update `index.html` title to "VistaFi"
-- localStorage persistence (Phase 6)
-- Category filter + search UI (Phase 7)
+- Phases 1–8 complete
+- Add E2E to CI pipeline (preview server in CI — Phase 9+)
+- Integration tests (component interactions — Phase 9+)
+- Version bump and production release checklist
