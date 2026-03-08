@@ -56,7 +56,7 @@ export const BudgetItemList = ({ items, onDeleteItem, onEditItem }: BudgetItemLi
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
               <button
                 onClick={() => onEditItem(item)}
-                className="p-2 rounded-lg text-muted hover:text-ink hover:bg-border cursor-pointer transition-colors duration-150"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-muted hover:text-ink hover:bg-border cursor-pointer transition-colors duration-150"
                 aria-label={`Edit ${item.description}`}
               >
                 <svg width="15" height="15" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -65,7 +65,7 @@ export const BudgetItemList = ({ items, onDeleteItem, onEditItem }: BudgetItemLi
               </button>
               <button
                 onClick={() => onDeleteItem(item.id)}
-                className="p-2 rounded-lg text-muted hover:text-expense hover:bg-border cursor-pointer transition-colors duration-150"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-muted hover:text-expense hover:bg-border cursor-pointer transition-colors duration-150"
                 aria-label={`Delete ${item.description}`}
               >
                 <svg width="15" height="15" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

@@ -22,7 +22,7 @@ export const FilterBar = ({ active, onChange, searchQuery, onSearchChange }: Fil
           <button
             key={filter.value}
             onClick={() => onChange(filter.value)}
-            className={`h-8 px-3 rounded-full text-sm font-medium cursor-pointer transition-colors duration-150 ${
+            className={`min-h-[44px] flex items-center px-3 rounded-full text-sm font-medium cursor-pointer transition-colors duration-150 ${
               active === filter.value
                 ? 'bg-ink text-surface'
                 : 'border border-border text-muted hover:border-ink hover:text-ink'
@@ -40,12 +40,12 @@ export const FilterBar = ({ active, onChange, searchQuery, onSearchChange }: Fil
           value={searchQuery}
           onChange={e => onSearchChange(e.target.value)}
           placeholder="Search descriptions…"
-          className="h-8 px-3 rounded-full text-sm border border-border text-ink placeholder:text-muted bg-surface focus:outline-none focus:border-ink transition-colors duration-150"
+          className="min-h-[44px] px-3 rounded-full text-sm border border-border text-ink placeholder:text-muted bg-surface focus:outline-none focus:border-ink transition-colors duration-150"
         />
         {searchQuery ? (
           <button
             onClick={() => onSearchChange('')}
-            className="h-8 w-8 flex items-center justify-center rounded-full text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
             aria-label="Clear search"
           >
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">

@@ -61,7 +61,7 @@ export const EditModal = ({ item, onSave, onCancel }: EditModalProps) => {
                   key={t}
                   type="button"
                   onClick={() => setType(t)}
-                  className={`flex-1 h-9 rounded-lg text-sm font-medium cursor-pointer transition-colors duration-150 ${
+                  className={`flex-1 min-h-[44px] rounded-lg text-sm font-medium cursor-pointer transition-colors duration-150 ${
                     type === t
                       ? 'bg-ink text-surface'
                       : 'border border-border text-muted hover:border-ink hover:text-ink'
@@ -89,7 +89,7 @@ export const EditModal = ({ item, onSave, onCancel }: EditModalProps) => {
                 step="0.01"
                 min="0.01"
                 required
-                className="w-full pl-8 pr-4 py-2.5 border border-border rounded-lg text-ink bg-transparent placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-ink num"
+                className="w-full min-h-[44px] pl-8 pr-4 py-2.5 border border-border rounded-lg text-ink bg-transparent placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-ink num"
               />
             </div>
           </div>
@@ -104,7 +104,7 @@ export const EditModal = ({ item, onSave, onCancel }: EditModalProps) => {
                 id="edit-category"
                 value={expenseCategory}
                 onChange={(e) => setExpenseCategory(e.target.value as 'expense' | 'savings')}
-                className="w-full py-2.5 px-3 border border-border rounded-lg text-ink bg-surface focus:outline-none focus:ring-1 focus:ring-ink cursor-pointer"
+                className="w-full min-h-[44px] py-2.5 px-3 border border-border rounded-lg text-ink bg-surface focus:outline-none focus:ring-1 focus:ring-ink cursor-pointer"
               >
                 <option value="expense">General Expense</option>
                 <option value="savings">Savings</option>
@@ -124,7 +124,7 @@ export const EditModal = ({ item, onSave, onCancel }: EditModalProps) => {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What's this for?"
               required
-              className="w-full py-2.5 px-3 border border-border rounded-lg text-ink bg-transparent placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-ink"
+              className="w-full min-h-[44px] py-2.5 px-3 border border-border rounded-lg text-ink bg-transparent placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-ink"
             />
           </div>
 
