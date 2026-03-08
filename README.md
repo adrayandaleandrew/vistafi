@@ -45,7 +45,7 @@ Run the development server:
 npm run dev
 ```
 
-This starts the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+This starts the app in development mode. Open [http://localhost:5173](http://localhost:5173) to view it in your browser.
 
 ### Building for Production
 

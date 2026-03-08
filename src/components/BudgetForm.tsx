@@ -6,7 +6,7 @@ interface BudgetFormProps {
   onAddItem: (item: BudgetItem) => void;
 }
 
-export const BudgetForm = ({ onAddItem }: BudgetFormProps) => {
+export const BudgetForm = ({ onAddItem }: Readonly<BudgetFormProps>) => {
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [expenseCategory, setExpenseCategory] = useState<'expense' | 'savings'>('expense');
   const [amount, setAmount] = useState('');
