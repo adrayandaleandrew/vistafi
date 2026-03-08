@@ -1,37 +1,46 @@
-import { useState, useEffect } from "react";
-import { BudgetItem, BudgetCategory } from "@shared/types/budget";
-import { mockBudgetItems } from "@shared/data/mockData";
-import { calculateBudgetSummary } from "@shared/utils/budgetUtils";
+import { useState, useEffect } from 'react';
+import { BudgetItem, BudgetCategory } from '@shared/types/budget';
+import { calculateBudgetSummary } from '@shared/utils/budgetUtils';
+import { fetchItems, addItem, updateItem, deleteItem } from '../services/budgetService';
 
 export function useBudget() {
-  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(() => {
-    const stored = localStorage.getItem('vistafi-items');
-    if (stored) {
-      try { return JSON.parse(stored) as BudgetItem[]; }
-      catch { return mockBudgetItems; }
-    }
-    return mockBudgetItems;
-  });
+  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [itemToEdit, setItemToEdit] = useState<BudgetItem | null>(null);
   const [filterCategory, setFilterCategory] = useState<BudgetCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('vistafi-items', JSON.stringify(budgetItems));
-    } catch {
-      // QuotaExceededError or other storage errors — ignore silently
-    }
-  }, [budgetItems]);
+    setIsLoading(true);
+    fetchItems()
+      .then(items => setBudgetItems(items))
+      .catch(() => setDataError('Could not load transactions. Check your connection.'))
+      .finally(() => setIsLoading(false));
+  }, []);
 
-  const handleAddItem = (newItem: BudgetItem) => setBudgetItems(curr => [...curr, newItem]);
+  const handleAddItem = async (newItem: BudgetItem) => {
+    const itemData: Omit<BudgetItem, 'id'> = {
+      description: newItem.description,
+      amount: newItem.amount,
+      category: newItem.category,
+      date: newItem.date,
+    };
+    const serverItem = await addItem(itemData);
+    setBudgetItems(curr => [...curr, serverItem]);
+  };
 
-  const handleDeleteItem = (id: string) => setBudgetItems(curr => curr.filter(i => i.id !== id));
+  const handleDeleteItem = async (id: string) => {
+    await deleteItem(id);
+    setBudgetItems(curr => curr.filter(i => i.id !== id));
+  };
 
   const handleEditItem = (item: BudgetItem) => setItemToEdit(item);
 
-  const handleSaveEdit = (updated: BudgetItem) => {
-    setBudgetItems(curr => curr.map(i => i.id === updated.id ? updated : i));
+  const handleSaveEdit = async (updated: BudgetItem) => {
+    const { id, ...changes } = updated;
+    const serverItem = await updateItem(id, changes);
+    setBudgetItems(curr => curr.map(i => i.id === serverItem.id ? serverItem : i));
     setItemToEdit(null);
   };
 
@@ -51,6 +60,8 @@ export function useBudget() {
     setSearchQuery,
     filteredItems,
     summary,
+    isLoading,
+    dataError,
     handleAddItem,
     handleDeleteItem,
     handleEditItem,

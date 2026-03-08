@@ -10,6 +10,7 @@
   --color-expense: #C1281A;
   --color-savings: #1E52BB;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; }

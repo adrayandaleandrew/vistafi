@@ -1,11 +1,15 @@
-import { BudgetForm } from "./components/BudgetForm";
-import { BudgetItemList } from "./components/BudgetItemList";
-import { BudgetSummary } from "./components/BudgetSummary";
-import { FilterBar } from "./components/FilterBar";
-import { EditModal } from "./components/EditModal";
-import { useBudget } from "./hooks/useBudget";
+import { useState } from 'react';
+import { BudgetForm } from './components/BudgetForm';
+import { BudgetItemList } from './components/BudgetItemList';
+import { BudgetSummary } from './components/BudgetSummary';
+import { FilterBar } from './components/FilterBar';
+import { EditModal } from './components/EditModal';
+import { LoginPage } from './pages/LoginPage';
+import { SignupPage } from './pages/SignupPage';
+import { useAuth } from './context/AuthContext';
+import { useBudget } from './hooks/useBudget';
 
-function App() {
+function BudgetApp() {
   const {
     itemToEdit,
     filterCategory,
@@ -14,6 +18,8 @@ function App() {
     setSearchQuery,
     filteredItems,
     summary,
+    isLoading,
+    dataError,
     handleAddItem,
     handleDeleteItem,
     handleEditItem,
@@ -21,12 +27,40 @@ function App() {
     handleCancelEdit,
   } = useBudget();
 
+  const { signOut } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <p className="text-muted text-sm">Loading transactions…</p>
+      </div>
+    );
+  }
+
+  if (dataError) {
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <p role="alert" className="text-expense text-sm">{dataError}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-canvas">
       <div className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <header className="mb-8">
-          <h1 className="text-2xl font-bold text-ink">VistaFi</h1>
-          <p className="text-sm text-muted">Simple Budget Planner</p>
+        <header className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-ink">VistaFi</h1>
+            <p className="text-sm text-muted">Simple Budget Planner</p>
+          </div>
+          <button
+            type="button"
+            onClick={signOut}
+            aria-label="Sign out"
+            className="min-h-[44px] px-4 text-sm text-muted hover:text-ink cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-lg"
+          >
+            Sign out
+          </button>
         </header>
 
         <BudgetSummary summary={summary} />
@@ -58,6 +92,29 @@ function App() {
       ) : null}
     </div>
   );
+}
+
+function App() {
+  const { user, isLoading } = useAuth();
+  const [authView, setAuthView] = useState<'login' | 'signup'>('login');
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <p className="text-muted text-sm">Loading…</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return authView === 'login' ? (
+      <LoginPage onShowSignup={() => setAuthView('signup')} />
+    ) : (
+      <SignupPage onShowLogin={() => setAuthView('login')} />
+    );
+  }
+
+  return <BudgetApp />;
 }
 
 export default App;
