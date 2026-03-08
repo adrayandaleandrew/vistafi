@@ -209,11 +209,11 @@ Implement actual edit functionality.
 
 ## Tasks
 
-- [ ] Decide on edit pattern (inline edit vs. modal vs. form pre-fill)
-- [ ] Populate `BudgetForm` with `itemToEdit` values when set
-- [ ] Update `handleEditItem` to replace the existing item instead of adding a new one
-- [ ] Add cancel/reset logic to clear `itemToEdit`
-- [ ] Remove placeholder `alert()` from `handleEditItem`
+- [x] Decide on edit pattern (inline edit vs. modal vs. form pre-fill)
+- [x] Populate `BudgetForm` with `itemToEdit` values when set
+- [x] Update `handleEditItem` to replace the existing item instead of adding a new one
+- [x] Add cancel/reset logic to clear `itemToEdit`
+- [x] Remove placeholder `alert()` from `handleEditItem`
 
 ---
 
@@ -236,8 +236,8 @@ Fix known issues from post-Phase-3 review.
 
 ## Tasks
 
-- [ ] Fix `index.css` — remove leftover Vite scaffold styles (dark `:root` background) that conflict with Tailwind light theme
-- [ ] Update `index.html` title from "Vite + React + TS" to "VistaFi"
+- [x] Fix `index.css` — remove leftover Vite scaffold styles (dark `:root` background) that conflict with Tailwind light theme
+- [x] Update `index.html` title from "Vite + React + TS" to "VistaFi"
 
 ---
 
@@ -258,8 +258,8 @@ Preserve transactions across page refreshes.
 
 ## Tasks
 
-- [ ] Save `budgetItems` to `localStorage` on every change
-- [ ] Load `budgetItems` from `localStorage` on app init (fall back to mock data if empty)
+- [x] Save `budgetItems` to `localStorage` on every change
+- [x] Load `budgetItems` from `localStorage` on app init (fall back to mock data if empty)
 
 ---
 
@@ -280,9 +280,9 @@ Let users find and filter transactions.
 
 ## Tasks
 
-- [ ] Add category filter (All / Income / Expense / Savings)
-- [ ] Add text search on description
-- [ ] Filter applied to `BudgetItemList` display only (does not affect summary totals)
+- [x] Add category filter (All / Income / Expense / Savings)
+- [x] Add text search on description
+- [x] Filter applied to `BudgetItemList` display only (does not affect summary totals)
 
 ---
 

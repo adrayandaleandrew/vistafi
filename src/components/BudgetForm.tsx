@@ -81,7 +81,7 @@ export const BudgetForm = ({ onAddItem }: BudgetFormProps) => {
       </div>
 
       {/* Category — only when expense */}
-      {type === 'expense' && (
+      {type === 'expense' ? (
         <div className="mb-5">
           <label htmlFor="category" className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-muted mb-2">
             Category
@@ -96,7 +96,7 @@ export const BudgetForm = ({ onAddItem }: BudgetFormProps) => {
             <option value="savings">Savings</option>
           </select>
         </div>
-      )}
+      ) : null}
 
       {/* Description */}
       <div className="mb-6">
