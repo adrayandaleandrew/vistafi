@@ -18,7 +18,7 @@ const amountPrefix = (category: BudgetCategory): string => {
   return category === 'income' ? '+' : '−';
 };
 
-export const BudgetItemList = ({ items, onDeleteItem, onEditItem }: BudgetItemListProps) => {
+export const BudgetItemList = ({ items, onDeleteItem, onEditItem }: Readonly<BudgetItemListProps>) => {
   if (items.length === 0) {
     return (
       <div className="border border-border rounded-xl px-6 py-12 text-center">

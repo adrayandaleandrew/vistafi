@@ -4,7 +4,7 @@ interface BudgetSummaryProps {
   summary: BudgetSummaryType;
 }
 
-export const BudgetSummary = ({ summary }: BudgetSummaryProps) => {
+export const BudgetSummary = ({ summary }: Readonly<BudgetSummaryProps>) => {
   const { totalIncome, totalExpenses, totalSavings, balance } = summary;
 
   const metrics = [
