@@ -68,16 +68,25 @@ User handles merging and pulling to local master manually — never auto-merge.
 src/
   App.tsx                 # Root — all state lives here
   main.tsx
+  index.css               # @theme tokens + body styles
   components/
-    BudgetForm.tsx        # Add/edit transaction form
-    BudgetItemList.tsx    # Transaction list (edit + delete per row)
-    BudgetSummary.tsx     # 4-card summary (income, expenses, savings, balance)
-  data/
-    mockData.ts           # Seed data (7 items)
+    BudgetForm.tsx        # Add transaction form (segmented type control)
+    BudgetItemList.tsx    # Transaction list (hover-reveal edit + delete)
+    BudgetSummary.tsx     # Bento grid: balance hero + 3 metrics
+    FilterBar.tsx         # Category filter pills + text search
+    EditModal.tsx         # Edit transaction modal (ESC/backdrop dismiss)
+shared/
   types/
     budget.ts             # BudgetItem, BudgetSummary, BudgetCategory
   utils/
     budgetUtils.ts        # calculateBudgetSummary(), generateId()
+  data/
+    mockData.ts           # Seed data (7 items)
+tests/
+  unit/
+    budgetUtils.test.ts   # 14 Vitest unit tests
+  e2e/
+    app.spec.ts           # 11 Playwright E2E tests
 docs/                     # Project standards — read before every task
 .agents/skills/           # Coding skill library — reference during all work
 ```
