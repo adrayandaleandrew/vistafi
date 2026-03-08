@@ -22,7 +22,7 @@ export const FilterBar = ({ active, onChange, searchQuery, onSearchChange }: Rea
           <button
             key={filter.value}
             onClick={() => onChange(filter.value)}
-            className={`min-h-[44px] flex items-center px-3 rounded-full text-sm font-medium cursor-pointer transition-colors duration-150 ${
+            className={`min-h-[44px] flex items-center px-3 rounded-full text-sm font-medium cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1 ${
               active === filter.value
                 ? 'bg-ink text-surface'
                 : 'border border-border text-muted hover:border-ink hover:text-ink'

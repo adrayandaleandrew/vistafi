@@ -47,15 +47,43 @@ describe('BudgetItemList', () => {
     expect(onEditItem).toHaveBeenCalledWith(item)
   })
 
-  it('should call onDeleteItem with the correct item id when delete button is clicked', async () => {
+  it('should show confirm button on first delete click, not immediately delete', async () => {
     // Given
     const item = makeItem({ id: 'abc123', description: 'Utilities' })
     const onDeleteItem = vi.fn()
     const user = userEvent.setup()
     render(<BudgetItemList items={[item]} onDeleteItem={onDeleteItem} onEditItem={vi.fn()} />)
-    // When
+    // When — first click
     await user.click(screen.getByRole('button', { name: `Delete ${item.description}` }))
+    // Then — not deleted yet, confirm button appears
+    expect(onDeleteItem).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: /confirm delete/i })).toBeInTheDocument()
+  })
+
+  it('should call onDeleteItem with the correct item id on confirm click', async () => {
+    // Given
+    const item = makeItem({ id: 'abc123', description: 'Utilities' })
+    const onDeleteItem = vi.fn()
+    const user = userEvent.setup()
+    render(<BudgetItemList items={[item]} onDeleteItem={onDeleteItem} onEditItem={vi.fn()} />)
+    // When — two-step delete
+    await user.click(screen.getByRole('button', { name: `Delete ${item.description}` }))
+    await user.click(screen.getByRole('button', { name: /confirm delete/i }))
     // Then
     expect(onDeleteItem).toHaveBeenCalledWith('abc123')
+  })
+
+  it('should cancel pending delete when cancel button is clicked', async () => {
+    // Given
+    const item = makeItem({ description: 'Utilities' })
+    const onDeleteItem = vi.fn()
+    const user = userEvent.setup()
+    render(<BudgetItemList items={[item]} onDeleteItem={onDeleteItem} onEditItem={vi.fn()} />)
+    // When
+    await user.click(screen.getByRole('button', { name: `Delete ${item.description}` }))
+    await user.click(screen.getByRole('button', { name: /cancel delete/i }))
+    // Then
+    expect(onDeleteItem).not.toHaveBeenCalled()
+    expect(screen.queryByRole('button', { name: /confirm delete/i })).not.toBeInTheDocument()
   })
 })

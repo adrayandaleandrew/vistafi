@@ -71,4 +71,31 @@ describe('BudgetForm', () => {
     // Then
     expect(onAddItem).not.toHaveBeenCalled()
   })
+
+  it('should submit savings category when Savings is selected from category dropdown', async () => {
+    // Given
+    const onAddItem = vi.fn()
+    const user = userEvent.setup()
+    render(<BudgetForm onAddItem={onAddItem} />)
+    // When — Expense is default type, switch category to Savings
+    await user.selectOptions(screen.getByLabelText(/category/i), 'savings')
+    await user.type(screen.getByLabelText(/amount/i), '100')
+    await user.type(screen.getByLabelText(/description/i), 'Emergency Fund')
+    await user.click(screen.getByRole('button', { name: /add transaction/i }))
+    // Then
+    expect(onAddItem).toHaveBeenCalledOnce()
+    expect(onAddItem.mock.calls[0][0].category).toBe('savings')
+  })
+
+  it('should show success confirmation after adding a transaction', async () => {
+    // Given
+    const user = userEvent.setup()
+    render(<BudgetForm onAddItem={vi.fn()} />)
+    // When
+    await user.type(screen.getByLabelText(/amount/i), '100')
+    await user.type(screen.getByLabelText(/description/i), 'Test item')
+    await user.click(screen.getByRole('button', { name: /add transaction/i }))
+    // Then
+    expect(screen.getByRole('status')).toHaveTextContent(/transaction added/i)
+  })
 })

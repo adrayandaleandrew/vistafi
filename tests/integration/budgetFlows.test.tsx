@@ -16,6 +16,19 @@ const getForm = () => screen.getByText('Quick Add').closest('form') as HTMLFormE
 const getModal = () =>
   screen.getByText('Edit Transaction').closest('div[class*="relative"]') as HTMLElement
 
+describe('localStorage persistence', () => {
+  it('should load items from localStorage when available, instead of mock data', () => {
+    // Given — pre-populate localStorage with a custom item
+    const customItems = [{ id: 'x1', description: 'Custom Persisted Item', amount: 999, category: 'income', date: '2024-06-01' }]
+    localStorage.setItem('vistafi-items', JSON.stringify(customItems))
+    // When
+    render(<App />)
+    // Then — shows custom item, not mock data
+    expect(screen.getByText('Custom Persisted Item')).toBeInTheDocument()
+    expect(screen.queryByText('Groceries')).not.toBeInTheDocument()
+  })
+})
+
 describe('Budget CRUD flows', () => {
   it('should add income item and update summary totalIncome', async () => {
     // Given
@@ -42,23 +55,25 @@ describe('Budget CRUD flows', () => {
     expect(screen.getByText('$2100.00')).toBeInTheDocument()
   })
 
-  it('should delete item and remove it from the list', async () => {
+  it('should delete item and remove it from the list after confirmation', async () => {
     // Given
     const user = userEvent.setup()
     render(<App />)
     expect(screen.getByText('Groceries')).toBeInTheDocument()
-    // When
+    // When — two-step delete
     await user.click(screen.getByRole('button', { name: 'Delete Groceries' }))
+    await user.click(screen.getByRole('button', { name: /confirm delete/i }))
     // Then
     expect(screen.queryByText('Groceries')).not.toBeInTheDocument()
   })
 
-  it('should delete item and update summary expenses', async () => {
+  it('should delete item and update summary expenses after confirmation', async () => {
     // Given
     const user = userEvent.setup()
     render(<App />)
     // When — delete Groceries ($400 expense); expenses: 2100 → 1700
     await user.click(screen.getByRole('button', { name: 'Delete Groceries' }))
+    await user.click(screen.getByRole('button', { name: /confirm delete/i }))
     // Then
     expect(screen.getByText('$1700.00')).toBeInTheDocument()
   })

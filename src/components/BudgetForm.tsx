@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BudgetCategory, BudgetItem } from "@shared/types/budget";
 import { generateId } from "@shared/utils/budgetUtils";
 
@@ -11,6 +11,13 @@ export const BudgetForm = ({ onAddItem }: Readonly<BudgetFormProps>) => {
   const [expenseCategory, setExpenseCategory] = useState<'expense' | 'savings'>('expense');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+  const [showAdded, setShowAdded] = useState(false);
+
+  useEffect(() => {
+    if (!showAdded) return;
+    const timer = setTimeout(() => setShowAdded(false), 2000);
+    return () => clearTimeout(timer);
+  }, [showAdded]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +37,7 @@ export const BudgetForm = ({ onAddItem }: Readonly<BudgetFormProps>) => {
     setAmount('');
     setType('expense');
     setExpenseCategory('expense');
+    setShowAdded(true);
   };
 
   return (
@@ -47,7 +55,7 @@ export const BudgetForm = ({ onAddItem }: Readonly<BudgetFormProps>) => {
               key={t}
               type="button"
               onClick={() => setType(t)}
-              className={`flex-1 min-h-[44px] rounded-lg text-sm font-medium cursor-pointer transition-colors duration-150 ${
+              className={`flex-1 min-h-[44px] rounded-lg text-sm font-medium cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1 ${
                 type === t
                   ? 'bg-ink text-surface'
                   : 'border border-border text-muted hover:border-ink hover:text-ink'
@@ -116,10 +124,16 @@ export const BudgetForm = ({ onAddItem }: Readonly<BudgetFormProps>) => {
 
       <button
         type="submit"
-        className="w-full min-h-[44px] bg-ink text-surface font-medium rounded-lg hover:opacity-90 cursor-pointer transition-opacity duration-150"
+        className="w-full min-h-[44px] bg-ink text-surface font-medium rounded-lg hover:opacity-90 cursor-pointer transition-opacity duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1"
       >
         Add Transaction
       </button>
+
+      {showAdded ? (
+        <p role="status" aria-live="polite" className="text-xs text-income text-center mt-3">
+          Transaction added!
+        </p>
+      ) : null}
     </form>
   );
 };
