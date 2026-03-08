@@ -49,6 +49,14 @@ Before planning and throughout code changes, consult:
 - No `dangerouslySetInnerHTML`
 - Controlled inputs only (`value` + `onChange`)
 
+#### Security Rules (Non-Negotiable)
+- **Never put real Supabase URLs, anon keys, or any backend credentials anywhere except `.env.local`**
+- `.env.local` is gitignored — it must never be committed or pushed under any circumstances
+- All `*.example` files must contain placeholder templates only — no real values, no real domains, no patterns that hint at real project identifiers
+- Never use the Supabase `service_role` key client-side — it bypasses RLS entirely
+- No secrets, tokens, or credentials in source code, comments, config files, or CI workflow files (use GitHub Actions secrets for CI)
+- When generating any env-related file, verify with `git check-ignore` that it is blocked before committing
+
 ### Step 3 — Post-Implementation Compliance Check
 After all code changes are done, verify every change against:
 - All applicable files in `docs/`
