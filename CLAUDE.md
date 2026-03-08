@@ -54,7 +54,10 @@ After all code changes are done, verify every change against:
 
 Fix anything that conflicts before proceeding.
 
-### Step 4 — Push to GitHub
+### Step 4 — Update active-context.md
+After plan approval and before writing any code, copy the full approved plan into `docs/active-context.md`. This ensures the active context always reflects the current task.
+
+### Step 5 — Push to GitHub
 Only push after the compliance check passes.
 User handles merging and pulling to local master manually — never auto-merge.
 
