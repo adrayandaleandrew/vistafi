@@ -329,6 +329,40 @@ Add automated test coverage.
 
 ---
 
+# PHASE 9 — QUALITY & RELEASE
+
+## Objective
+
+Close remaining post-Phase-8 audit gaps: test coverage, CI completeness, and version release.
+
+---
+
+## Tasks
+
+### Testing
+
+- [ ] Add component unit tests — BudgetForm, BudgetItemList, BudgetSummary, FilterBar, EditModal
+- [ ] Add integration tests — component interaction flows (add→list+summary, delete→list+summary, edit→list+summary)
+
+### CI/CD
+
+- [ ] Add E2E tests to CI pipeline (requires preview server in CI)
+
+### Release
+
+- [ ] Version bump to 1.0.0 in package.json
+- [ ] Production release checklist
+
+---
+
+## Done Criteria
+
+- Test pyramid balanced: ~70% unit, ~20% integration, ~10% E2E
+- E2E runs on every PR in CI
+- Version tagged and release notes written
+
+---
+
 # NON-GOALS (FOR NOW)
 
 - User accounts or authentication
