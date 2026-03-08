@@ -1,24 +1,46 @@
 {
   "name": "vistafi-mobile",
   "version": "1.0.0",
-  "main": "App.tsx",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
-    "ios": "expo start --ios"
+    "ios": "expo start --ios",
+    "test": "jest"
   },
   "dependencies": {
     "expo": "~52.0.0",
+    "expo-router": "~4.0.0",
     "expo-status-bar": "~2.0.0",
+    "expo-secure-store": "~14.0.0",
+    "expo-haptics": "~14.0.0",
+    "expo-local-authentication": "~15.0.0",
     "react": "18.3.2",
     "react-native": "0.76.3",
-    "@react-navigation/native": "^6.1.0",
-    "@react-navigation/bottom-tabs": "^6.5.0",
     "react-native-safe-area-context": "4.12.0",
-    "react-native-screens": "~4.1.0"
+    "react-native-screens": "~4.1.0",
+    "react-native-reanimated": "~3.16.0",
+    "react-native-gesture-handler": "~2.20.0",
+    "@react-native-async-storage/async-storage": "~2.1.0",
+    "@react-native-community/netinfo": "~11.4.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "@tanstack/react-query": "^5.17.0",
+    "@tanstack/react-query-persist-client": "^5.17.0",
+    "@tanstack/query-async-storage-persister": "^5.17.0",
+    "@shopify/flash-list": "^1.6.3"
   },
   "devDependencies": {
     "@types/react": "~18.3.12",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "jest-expo": "~52.0.0",
+    "@testing-library/react-native": "^12.4.0",
+    "@testing-library/jest-native": "^5.4.3"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFilesAfterFramework": ["@testing-library/jest-native/extend-expect"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|@supabase|@tanstack|@shopify)"
+    ]
   }
 }
