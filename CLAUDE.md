@@ -19,6 +19,7 @@ Never code on master directly.
 ### Step 2 — Read Docs and Skills During Planning and Implementation
 Before planning and throughout code changes, consult:
 - All files in `docs/` — standards, conventions, and task plan
+- `docs/SecurityGuide.md` — mobile + Supabase-specific security rules
 - `.agents/skills/` — coding best practices; all skills are listed below with their scope
 
 #### Skill Index
@@ -60,6 +61,7 @@ Before planning and throughout code changes, consult:
 ### Step 3 — Post-Implementation Compliance Check
 After all code changes are done, verify every change against:
 - All applicable files in `docs/`
+- `docs/SecurityGuide.md` — pre-push audit checklist + Supabase/mobile security rules
 - All applicable rules in `.agents/skills/`
 
 Fix anything that conflicts before proceeding.
