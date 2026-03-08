@@ -33,7 +33,9 @@ export const FilterBar = ({ active, onChange, searchQuery, onSearchChange }: Fil
         ))}
       </div>
       <div className="flex items-center gap-1">
+        <label htmlFor="search-transactions" className="sr-only">Search transactions</label>
         <input
+          id="search-transactions"
           type="search"
           value={searchQuery}
           onChange={e => onSearchChange(e.target.value)}
@@ -46,7 +48,9 @@ export const FilterBar = ({ active, onChange, searchQuery, onSearchChange }: Fil
             className="h-8 w-8 flex items-center justify-center rounded-full text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
             aria-label="Clear search"
           >
-            ✕
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+              <path d="M1 1l8 8M9 1L1 9"/>
+            </svg>
           </button>
         ) : null}
       </div>
