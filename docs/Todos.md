@@ -306,14 +306,18 @@ Add automated test coverage.
 
 ### Unit
 
-- [ ] Test `calculateBudgetSummary()` — income, expense, savings totals, balance calculation
-- [ ] Test `generateId()` — returns unique strings
+- [x] Test `calculateBudgetSummary()` — income, expense, savings totals, balance calculation
+- [x] Test `generateId()` — returns unique strings
 
 ### E2E
 
-- [ ] Add transaction flow
-- [ ] Delete transaction flow
-- [ ] Edit transaction flow (after Phase 4 complete)
+- [x] Add transaction flow
+- [x] Delete transaction flow
+- [x] Edit transaction flow (after Phase 4 complete)
+
+### CI
+
+- [x] GitHub Actions pipeline (install → lint → unit tests → build)
 
 ---
 
