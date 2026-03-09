@@ -1,10 +1,11 @@
-# Active Context — Phase 15: Mobile Goals
+# Active Context — Phase 16: Advanced Analytics (COMPLETE)
 
 ## Context
 
-Phase 14 is complete and merged. Phase 15 brings the goals feature to the mobile app (Expo/React Native), reaching parity with the web goals feature introduced in Phase 14.
+Phase 16 adds an Advanced Analytics panel to the web app, providing monthly trend visualisation,
+savings rate metric, and top expenses breakdown. All 23 new tests pass (144 total).
 
-Branch: `feature/phase-15-mobile-goals`
+Branch: `feature/phase-16-analytics`
 
 ---
 
@@ -12,43 +13,53 @@ Branch: `feature/phase-15-mobile-goals`
 
 | # | Task | Status |
 |---|------|--------|
-| 15.A RED | goalService tests (5 tests) | pending |
-| 15.A GREEN | `mobile/src/services/goalService.ts` | pending |
-| 15.B RED | useGoals hook tests (5 tests) | pending |
-| 15.B GREEN | `mobile/src/hooks/useGoals.ts` | pending |
-| 15.C RED | set-goals screen tests (5 tests) | pending |
-| 15.C GREEN | `mobile/app/set-goals.tsx` | pending |
-| 15.D RED | Dashboard goals tests (4 new tests) | pending |
-| 15.D GREEN | Modify `mobile/app/(tabs)/index.tsx` | pending |
-| 15.E | Register set-goals in `mobile/app/_layout.tsx` | pending |
+| A RED | 14 utility tests (calculateMonthlyTrends, calculateSavingsRate, getTopExpenses) | ✅ |
+| A GREEN | `shared/types/budget.ts` — MonthlyTrend interface | ✅ |
+| A GREEN | `shared/utils/budgetUtils.ts` — 3 new functions | ✅ |
+| B RED | 7 component tests — analyticsPanel.test.tsx | ✅ |
+| B GREEN | `src/components/AnalyticsPanel.tsx` | ✅ |
+| C RED | 2 integration tests — Analytics toggle + savings rate | ✅ |
+| C GREEN | `src/App.tsx` — showAnalytics state + toggle button + ternary render | ✅ |
+| Docs | Update active-context.md, Todos.md, CLAUDE.md | ✅ |
 
 ---
 
 ## Architecture
 
+### New Types
+- `MonthlyTrend { month: string; totalIncome: number; totalExpenses: number; totalSavings: number; balance: number }`
+
+### New Utility Functions
+- `calculateMonthlyTrends(items, months=6): MonthlyTrend[]` — groups items by YYYY-MM, last N months ascending
+- `calculateSavingsRate(summary): number` — (totalSavings / totalIncome) * 100, returns 0 when income=0
+- `getTopExpenses(items, limit=5): BudgetItem[]` — expense items sorted by amount DESC
+
 ### New Files
-- `mobile/src/services/goalService.ts` — fetchGoals / upsertGoal / deleteGoal (Supabase)
-- `mobile/src/services/__tests__/goalService.test.ts` — 5 service tests
-- `mobile/src/hooks/useGoals.ts` — useGoals / useSetGoal / useDeleteGoal (React Query)
-- `mobile/src/hooks/__tests__/useGoals.test.ts` — 5 hook tests
-- `mobile/app/set-goals.tsx` — modal screen (3 text inputs, save/cancel)
-- `mobile/app/__tests__/set-goals.test.tsx` — 5 screen tests
+- `src/components/AnalyticsPanel.tsx` — three-card analytics UI
+  - Monthly Trend: 6-month grouped bar chart (income/expense bars per month)
+  - Savings Rate: percentage with progress bar
+  - Top Expenses: ranked list of expense items
+- `tests/unit/components/analyticsPanel.test.tsx` — 7 component tests
+- `tests/unit/budgetUtils.test.ts` — 14 new tests appended (A1–A14)
 
 ### Modified Files
-- `mobile/app/(tabs)/index.tsx` — add Goals button + GoalProgress sub-component + per-category progress bars
-- `mobile/app/(tabs)/__tests__/index.test.tsx` — add 4 new tests (tests 8–11)
-- `mobile/app/_layout.tsx` — register `set-goals` as modal Stack.Screen
-
-### Supabase Table
-- Reuses `budget_goals` table from Phase 14 (same schema, same RLS)
-- Mobile goalService maps `target_amount` → `targetAmount` same as web
+- `shared/types/budget.ts` — add MonthlyTrend interface
+- `shared/utils/budgetUtils.ts` — add 3 functions
+- `tests/integration/budgetFlows.test.tsx` — add 2 tests (C1, C2)
+- `src/App.tsx` — showAnalytics state, Analytics toggle button (`aria-label="Show analytics"` / `"Hide analytics"`), ternary panel switch
 
 ## Key Rules Applied
-- TDD iron law: failing test FIRST
-- Functional setState (`curr => ...`)
-- Ternary conditionals (not &&)
-- All interactive elements minHeight: 44
-- useCallback on all callbacks
-- React.memo on GoalProgress sub-component
-- No console.log, no inline styles, no TouchableOpacity
-- StyleSheet.create only — Warm Ledger tokens
+- TDD iron law: failing test FIRST (Red-Green-Refactor)
+- Functional setState: `setShowAnalytics(curr => !curr)`
+- Ternary conditionals (not &&): `{showAnalytics ? <AnalyticsPanel /> : <>...</>}`
+- `Readonly` on AnalyticsPanelProps
+- Dynamic bar heights via inline `style={{ height: '${pct}%' }}` (OK for dynamic values)
+- `aria-label` on Analytics toggle button, `aria-pressed` for toggle state
+- `role="img"` + `aria-label` on chart container
+- All amounts `.toFixed(2)` with `className="num"`
+- No console.log, no dangerouslySetInnerHTML, no new npm dependencies
+
+## Test Counts
+- Pre-Phase-16: 121 tests
+- Phase 16 new: 23 tests (14 utility + 7 component + 2 integration)
+- Total: 144 tests — all passing
