@@ -98,4 +98,49 @@ describe('BudgetForm', () => {
     // Then
     expect(screen.getByRole('status')).toHaveTextContent(/transaction added/i)
   })
+
+  // --- Date picker tests (Task 13.2) ---
+
+  it('should render a date input labeled "Date"', () => {
+    // Given / When
+    render(<BudgetForm onAddItem={vi.fn()} />)
+    // Then
+    expect(screen.getByLabelText('Date')).toBeInTheDocument()
+  })
+
+  it('should render date input with type="date"', () => {
+    // Given / When
+    render(<BudgetForm onAddItem={vi.fn()} />)
+    // Then
+    const dateInput = screen.getByLabelText('Date') as HTMLInputElement
+    expect(dateInput.type).toBe('date')
+  })
+
+  it('should default date input to today\'s ISO date string (YYYY-MM-DD)', () => {
+    // Given
+    const today = new Date().toISOString().split('T')[0]
+    // When
+    render(<BudgetForm onAddItem={vi.fn()} />)
+    // Then
+    const dateInput = screen.getByLabelText('Date') as HTMLInputElement
+    expect(dateInput.value).toBe(today)
+  })
+
+  it('should submit item with the date shown in the date input (not hardcoded Date.now())', async () => {
+    // Given
+    const onAddItem = vi.fn()
+    const user = userEvent.setup()
+    render(<BudgetForm onAddItem={onAddItem} />)
+    const dateInput = screen.getByLabelText('Date')
+    // When — change date to a past date
+    await user.clear(dateInput)
+    await user.type(dateInput, '2023-06-15')
+    await user.type(screen.getByLabelText(/amount/i), '250')
+    await user.type(screen.getByLabelText(/description/i), 'Backdated Payment')
+    await user.click(screen.getByRole('button', { name: /add transaction/i }))
+    // Then — submitted item date must match what was typed, not today
+    expect(onAddItem).toHaveBeenCalledOnce()
+    const item = onAddItem.mock.calls[0][0]
+    expect(item.date).toBe('2023-06-15')
+  })
 })

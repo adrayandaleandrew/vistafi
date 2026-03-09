@@ -1,13 +1,21 @@
 import { useState, useEffect } from 'react';
-import { BudgetItem, BudgetCategory } from '@shared/types/budget';
+import { BudgetItem, BudgetCategory, SortOption } from '@shared/types/budget';
 import { calculateBudgetSummary } from '@shared/utils/budgetUtils';
 import { fetchItems, addItem, updateItem, deleteItem } from '../services/budgetService';
+
+const SORT_FNS: Record<SortOption, (a: BudgetItem, b: BudgetItem) => number> = {
+  'date-desc':   (a, b) => b.date.localeCompare(a.date),
+  'date-asc':    (a, b) => a.date.localeCompare(b.date),
+  'amount-desc': (a, b) => b.amount - a.amount,
+  'amount-asc':  (a, b) => a.amount - b.amount,
+};
 
 export function useBudget() {
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [itemToEdit, setItemToEdit] = useState<BudgetItem | null>(null);
   const [filterCategory, setFilterCategory] = useState<BudgetCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('date-desc');
   const [isLoading, setIsLoading] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
 
@@ -48,16 +56,20 @@ export function useBudget() {
 
   const summary = calculateBudgetSummary(budgetItems);
 
-  const filteredItems = budgetItems
+  const filteredItems = [...budgetItems
     .filter(item => filterCategory === 'all' || item.category === filterCategory)
-    .filter(item => item.description.toLowerCase().includes(searchQuery.toLowerCase().trim()));
+    .filter(item => item.description.toLowerCase().includes(searchQuery.toLowerCase().trim()))
+  ].sort(SORT_FNS[sortBy]);
 
   return {
+    budgetItems,
     itemToEdit,
     filterCategory,
     setFilterCategory,
     searchQuery,
     setSearchQuery,
+    sortBy,
+    setSortBy,
     filteredItems,
     summary,
     isLoading,

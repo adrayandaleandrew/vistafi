@@ -851,6 +851,62 @@ Production-ready mobile app with realtime sync, performance targets met, and EAS
 
 ---
 
+# PHASE 13 — SORT, DATE PICKER & CSV EXPORT
+
+## Objective
+
+Web app backlog items: sort transactions, date picker on Quick Add, CSV export, and font refresh.
+
+---
+
+## Tasks
+
+### 13.1 — Sort Transactions (TDD) ✅ COMPLETE
+
+- [x] Add `SortOption` type to `shared/types/budget.ts`
+- [x] Add `sortBy` state + `SORT_FNS` lookup to `useBudget.ts`; spread before `.sort()` to avoid mutation
+- [x] Add `sortBy`/`onSortChange` required props to `FilterBar.tsx` + render `<select>` with 4 options
+- [x] Pass `sortBy`/`setSortBy` from `useBudget()` to `FilterBar` in `App.tsx`
+- [x] 5 new unit tests (filterBar.test.tsx) + 2 integration tests (budgetFlows.test.tsx)
+
+### 13.2 — Date Picker on Quick Add (TDD) ✅ COMPLETE
+
+- [x] Add `date` state (lazy `useState` init) to `BudgetForm.tsx`
+- [x] Add `<input type="date" />` labeled "Date"; use controlled state in submit; reset to today after submit
+- [x] 4 new unit tests (budgetForm.test.tsx)
+
+### 13.3 — CSV Export (TDD) ✅ COMPLETE
+
+- [x] Create `src/utils/csvExport.ts`: `generateCsv()` + `downloadCsv()` (DOM Blob API, web-only)
+- [x] Add Export CSV button to `App.tsx` header (ternary render when `budgetItems.length > 0`)
+- [x] Expose `budgetItems` in `useBudget()` return for export of unfiltered data
+- [x] 5 new unit tests (csvExport.test.ts)
+
+### 13.4 — Font Refresh (Design) ✅ COMPLETE
+
+- [x] Replace Inter with DM Sans in `index.html` Google Fonts link
+- [x] Update `--font-sans` token + body `font-family` in `index.css`
+- [x] Apply `style={{ fontFamily: 'var(--font-display)' }}` to `VistaFi` h1 in `App.tsx`
+- [x] Apply `style={{ fontFamily: 'var(--font-display)' }}` to `Quick Add` h2 in `BudgetForm.tsx`
+
+---
+
+## Testing (Phase 13)
+
+- 16 new tests total: 5 sort unit + 5 CSV unit + 4 date picker unit + 2 sort integration
+- All 104 tests pass (was 88 pre-Phase 13)
+
+---
+
+## Done Criteria (Phase 13) ✅
+
+1. Sort dropdown shows 4 options; default is Newest First (date-desc)
+2. Date input appears in Quick Add; backdated transactions saved with correct date
+3. Export CSV button appears when items exist; downloads valid CSV
+4. Body font is DM Sans; VistaFi h1 and Quick Add h2 render in Playfair Display
+
+---
+
 # MVP SUCCESS CRITERIA
 
 MVP is successful if:
