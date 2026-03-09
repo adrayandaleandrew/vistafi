@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, Pressable, StyleSheet } from 'react-native'
 import type { BudgetItem, BudgetCategory } from '@shared/types/budget'
 
 interface Props {
@@ -25,10 +25,9 @@ function TransactionItemComponent({ item, onLongPress, testID }: Props) {
   const label = CATEGORY_LABEL[item.category]
 
   return (
-    <View
+    <Pressable
       style={styles.row}
       testID={testID ?? `transaction-item-${item.id}`}
-      onStartShouldSetResponder={() => true}
       onLongPress={onLongPress}
       accessible
     >
@@ -43,7 +42,7 @@ function TransactionItemComponent({ item, onLongPress, testID }: Props) {
       <Text style={[styles.amount, { color }]}>
         {item.category === 'expense' ? '-' : '+'}${item.amount.toFixed(2)}
       </Text>
-    </View>
+    </Pressable>
   )
 }
 

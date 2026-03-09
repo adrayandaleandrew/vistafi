@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "test": "jest"
+    "test": "jest",
+    "type-check": "tsc --noEmit",
+    "test:ci": "jest --ci --passWithNoTests"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "~2.1.0",
@@ -32,6 +34,7 @@
   "devDependencies": {
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^12.4.0",
+    "@types/jest": "^30.0.0",
     "@types/react": "~18.3.12",
     "jest": "^29.7.0",
     "jest-expo": "~52.0.0",
