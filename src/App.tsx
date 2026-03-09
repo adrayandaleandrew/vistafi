@@ -8,14 +8,18 @@ import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { useAuth } from './context/AuthContext';
 import { useBudget } from './hooks/useBudget';
+import { generateCsv, downloadCsv } from './utils/csvExport';
 
 function BudgetApp() {
   const {
+    budgetItems,
     itemToEdit,
     filterCategory,
     setFilterCategory,
     searchQuery,
     setSearchQuery,
+    sortBy,
+    setSortBy,
     filteredItems,
     summary,
     isLoading,
@@ -50,17 +54,29 @@ function BudgetApp() {
       <div className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <header className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-ink">VistaFi</h1>
+            <h1 className="text-2xl font-bold text-ink" style={{ fontFamily: 'var(--font-display)' }}>VistaFi</h1>
             <p className="text-sm text-muted">Simple Budget Planner</p>
           </div>
-          <button
-            type="button"
-            onClick={signOut}
-            aria-label="Sign out"
-            className="min-h-[44px] px-4 text-sm text-muted hover:text-ink cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-lg"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-2">
+            {budgetItems.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => downloadCsv('vistafi-transactions.csv', generateCsv(budgetItems))}
+                aria-label="Export transactions as CSV"
+                className="min-h-[44px] px-4 text-sm text-muted hover:text-ink cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-lg"
+              >
+                Export CSV
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={signOut}
+              aria-label="Sign out"
+              className="min-h-[44px] px-4 text-sm text-muted hover:text-ink cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-lg"
+            >
+              Sign out
+            </button>
+          </div>
         </header>
 
         <BudgetSummary summary={summary} />
@@ -73,6 +89,8 @@ function BudgetApp() {
               onChange={setFilterCategory}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
             />
             <BudgetItemList
               items={filteredItems}

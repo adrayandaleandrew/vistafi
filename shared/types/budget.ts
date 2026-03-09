@@ -14,3 +14,5 @@ export interface BudgetSummary {
     totalSavings: number;
     balance: number;
 }
+
+export type SortOption = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc';

@@ -130,6 +130,34 @@ describe('Budget CRUD flows', () => {
   })
 })
 
+describe('Sort flows', () => {
+  it('should display items newest-first by default (item with latest date appears first)', async () => {
+    // Given — mockBudgetItems has Utilities on 2023-11-15 (latest date)
+    render(<App />)
+    await screen.findByText('Groceries')
+
+    // When — default sort is date-desc (newest first)
+    const listItems = screen.getAllByRole('listitem')
+
+    // Then — first item in list should be the one with latest date (Utilities 2023-11-15)
+    expect(listItems[0]).toHaveTextContent('Utilities')
+  })
+
+  it('should place highest-amount item first after switching sort to "amount-desc"', async () => {
+    // Given — mockBudgetItems has Monthly Salary at $4000 (highest)
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByText('Groceries')
+
+    // When — change sort to Amount High–Low
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Sort transactions' }), 'amount-desc')
+
+    // Then — first item should be Monthly Salary ($4000)
+    const listItems = screen.getAllByRole('listitem')
+    expect(listItems[0]).toHaveTextContent('Monthly Salary')
+  })
+})
+
 describe('Filter and search flows', () => {
   it('should filter by category and leave summary unchanged', async () => {
     // Given

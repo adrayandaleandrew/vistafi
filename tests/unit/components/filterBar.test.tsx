@@ -16,6 +16,8 @@ describe('FilterBar', () => {
         onChange={onChange}
         searchQuery=""
         onSearchChange={onSearchChange}
+        sortBy="date-desc"
+        onSortChange={vi.fn()}
       />
     )
     // Then
@@ -34,6 +36,8 @@ describe('FilterBar', () => {
         onChange={onChange}
         searchQuery=""
         onSearchChange={onSearchChange}
+        sortBy="date-desc"
+        onSortChange={vi.fn()}
       />
     )
     // When
@@ -53,6 +57,8 @@ describe('FilterBar', () => {
         onChange={onChange}
         searchQuery=""
         onSearchChange={onSearchChange}
+        sortBy="date-desc"
+        onSortChange={vi.fn()}
       />
     )
     // When
@@ -69,6 +75,8 @@ describe('FilterBar', () => {
         onChange={vi.fn()}
         searchQuery="rent"
         onSearchChange={vi.fn()}
+        sortBy="date-desc"
+        onSortChange={vi.fn()}
       />
     )
     // Then
@@ -83,6 +91,8 @@ describe('FilterBar', () => {
         onChange={vi.fn()}
         searchQuery=""
         onSearchChange={vi.fn()}
+        sortBy="date-desc"
+        onSortChange={vi.fn()}
       />
     )
     // Then
@@ -99,11 +109,103 @@ describe('FilterBar', () => {
         onChange={vi.fn()}
         searchQuery="rent"
         onSearchChange={onSearchChange}
+        sortBy="date-desc"
+        onSortChange={vi.fn()}
       />
     )
     // When
     await user.click(screen.getByRole('button', { name: 'Clear search' }))
     // Then
     expect(onSearchChange).toHaveBeenCalledWith('')
+  })
+
+  // --- Sort tests (Task 13.1) ---
+
+  it('should render a sort select with aria-label "Sort transactions"', () => {
+    // Given / When
+    render(
+      <FilterBar
+        active="all"
+        onChange={vi.fn()}
+        searchQuery=""
+        onSearchChange={vi.fn()}
+        sortBy="date-desc"
+        onSortChange={vi.fn()}
+      />
+    )
+    // Then
+    expect(screen.getByRole('combobox', { name: 'Sort transactions' })).toBeInTheDocument()
+  })
+
+  it('should render sort select with exactly 4 options: Newest First, Oldest First, Amount High–Low, Amount Low–High', () => {
+    // Given / When
+    render(
+      <FilterBar
+        active="all"
+        onChange={vi.fn()}
+        searchQuery=""
+        onSearchChange={vi.fn()}
+        sortBy="date-desc"
+        onSortChange={vi.fn()}
+      />
+    )
+    // Then
+    const select = screen.getByRole('combobox', { name: 'Sort transactions' })
+    const options = Array.from((select as HTMLSelectElement).options).map(o => o.text)
+    expect(options).toEqual(['Newest First', 'Oldest First', 'Amount High\u2013Low', 'Amount Low\u2013High'])
+  })
+
+  it('should have default selected value of "date-desc"', () => {
+    // Given / When
+    render(
+      <FilterBar
+        active="all"
+        onChange={vi.fn()}
+        searchQuery=""
+        onSearchChange={vi.fn()}
+        sortBy="date-desc"
+        onSortChange={vi.fn()}
+      />
+    )
+    // Then
+    const select = screen.getByRole('combobox', { name: 'Sort transactions' }) as HTMLSelectElement
+    expect(select.value).toBe('date-desc')
+  })
+
+  it('should call onSortChange with the selected value when sort select changes', async () => {
+    // Given
+    const onSortChange = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <FilterBar
+        active="all"
+        onChange={vi.fn()}
+        searchQuery=""
+        onSearchChange={vi.fn()}
+        sortBy="date-desc"
+        onSortChange={onSortChange}
+      />
+    )
+    // When
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Sort transactions' }), 'amount-desc')
+    // Then
+    expect(onSortChange).toHaveBeenCalledWith('amount-desc')
+  })
+
+  it('should have min-height of 44px on the sort select (touch target rule)', () => {
+    // Given / When
+    render(
+      <FilterBar
+        active="all"
+        onChange={vi.fn()}
+        searchQuery=""
+        onSearchChange={vi.fn()}
+        sortBy="date-desc"
+        onSortChange={vi.fn()}
+      />
+    )
+    // Then
+    const select = screen.getByRole('combobox', { name: 'Sort transactions' })
+    expect(select).toHaveClass('min-h-[44px]')
   })
 })

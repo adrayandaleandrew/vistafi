@@ -11,6 +11,7 @@ export const BudgetForm = ({ onAddItem }: Readonly<BudgetFormProps>) => {
   const [expenseCategory, setExpenseCategory] = useState<'expense' | 'savings'>('expense');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [showAdded, setShowAdded] = useState(false);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export const BudgetForm = ({ onAddItem }: Readonly<BudgetFormProps>) => {
       description: description.trim(),
       amount: parseFloat(amount),
       category,
-      date: new Date().toISOString().split('T')[0],
+      date,
     };
 
     onAddItem(newItem);
@@ -37,12 +38,13 @@ export const BudgetForm = ({ onAddItem }: Readonly<BudgetFormProps>) => {
     setAmount('');
     setType('expense');
     setExpenseCategory('expense');
+    setDate(new Date().toISOString().split('T')[0]);
     setShowAdded(true);
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-xl p-6">
-      <h2 className="text-base font-semibold text-ink mb-6">Quick Add</h2>
+      <h2 className="text-base font-semibold text-ink mb-6" style={{ fontFamily: 'var(--font-display)' }}>Quick Add</h2>
 
       {/* Type segmented control */}
       <div className="mb-5">
@@ -107,7 +109,7 @@ export const BudgetForm = ({ onAddItem }: Readonly<BudgetFormProps>) => {
       ) : null}
 
       {/* Description */}
-      <div className="mb-6">
+      <div className="mb-5">
         <label htmlFor="description" className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-muted mb-2">
           Description
         </label>
@@ -119,6 +121,21 @@ export const BudgetForm = ({ onAddItem }: Readonly<BudgetFormProps>) => {
           placeholder="What's this for?"
           required
           className="w-full min-h-[44px] py-2.5 px-3 border border-border rounded-lg text-ink bg-transparent placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-ink"
+        />
+      </div>
+
+      {/* Date */}
+      <div className="mb-6">
+        <label htmlFor="date" className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-muted mb-2">
+          Date
+        </label>
+        <input
+          id="date"
+          type="date"
+          value={date}
+          onChange={e => setDate(e.target.value)}
+          required
+          className="w-full min-h-[44px] py-2.5 px-3 border border-border rounded-lg text-ink bg-transparent focus:outline-none focus:ring-1 focus:ring-ink"
         />
       </div>
 

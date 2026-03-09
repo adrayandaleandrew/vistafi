@@ -1,12 +1,14 @@
-# Active Context — Phase 12c: Polish, Realtime & Release
+# Active Context — Phase 13: Sort, Date Picker & CSV Export
 
 ## Context
 
-Phase 12b (Dashboard, Add, History, Edit screens) is merged to master. Phase 12c is the final
-mobile phase: Profile screen, Supabase Realtime sync, performance validation, EAS build config,
-and a mobile CI workflow.
+Phase 12c is complete and merged. Phase 13 addresses four backlog items from the web app:
+- Sort transactions (newest-first default, 4 options)
+- Date picker on Quick Add (replace hardcoded today's date)
+- CSV export (client-side Blob download)
+- Font refresh (DM Sans body, activate Playfair Display headings)
 
-Branch: `feature/phase-12c-polish-realtime-release`
+Branch: `feature/phase-13-sort-date-export`
 
 ---
 
@@ -14,31 +16,38 @@ Branch: `feature/phase-12c-polish-realtime-release`
 
 | # | Task | Status |
 |---|------|--------|
-| 12.8 RED | Failing tests — Profile Screen (profile.tsx) | complete |
-| 12.8 GREEN | Profile Screen implementation | complete |
-| 12.9 RED | Failing tests — Realtime subscription (useBudgetItems.ts) | complete |
-| 12.9 GREEN | useBudgetItems Realtime implementation | complete |
-| 12.10 | Performance audit (static checks + npm audit) | complete |
-| 12.11 | EAS build config + mobile CI workflow | complete |
+| 13.1 RED | Failing tests — Sort transactions (filterBar + integration) | in progress |
+| 13.1 GREEN | Sort implementation (useBudget, FilterBar, App) | pending |
+| 13.2 RED | Failing tests — Date picker (budgetForm.test.tsx) | pending |
+| 13.2 GREEN | Date picker implementation (BudgetForm.tsx) | pending |
+| 13.3 RED | Failing tests — CSV export (csvExport.test.ts) | pending |
+| 13.3 GREEN | CSV export implementation (csvExport.ts + App.tsx) | pending |
+| 13.4 | Font refresh — DM Sans + Playfair Display (no TDD) | pending |
 
 ---
 
 ## Architecture
 
-- `mobile/app/(tabs)/profile.tsx` — Profile screen: email display, sign out, biometrics toggle
-- `mobile/app/(tabs)/__tests__/profile.test.tsx` — 7 tests for profile screen
-- `mobile/src/hooks/useBudgetItems.ts` — adds Realtime channel subscription + cleanup
-- `mobile/src/hooks/__tests__/useBudgetItems.test.ts` — 3 existing + 5 new Realtime tests
-- `mobile/eas.json` — EAS build config (development/preview/production)
-- `.github/workflows/mobile-ci.yml` — type-check + unit tests on push/PR
+- `shared/types/budget.ts` — add `SortOption` type
+- `src/hooks/useBudget.ts` — add `sortBy` state + sort pipeline; expose `budgetItems`
+- `src/components/FilterBar.tsx` — add `sortBy`/`onSortChange` required props + sort select
+- `src/App.tsx` — pass sort props; add Export CSV button; apply display font to h1
+- `src/components/BudgetForm.tsx` — add `date` state + date input; apply display font to h2
+- `src/utils/csvExport.ts` — NEW: `generateCsv()` + `downloadCsv()`
+- `tests/unit/csvExport.test.ts` — NEW: 5 unit tests
+- `tests/unit/components/filterBar.test.tsx` — 6 existing renders updated + 5 new sort tests
+- `tests/unit/components/budgetForm.test.tsx` — 4 new date picker tests
+- `tests/integration/budgetFlows.test.tsx` — 2 new sort integration tests
+- `index.html` — replace Inter with DM Sans
+- `src/index.css` — update `--font-sans` + body font-family
 
 ## Key Rules Applied
-- TDD iron law: failing test FIRST, no production code without failing test
+- TDD iron law: failing test FIRST
+- Functional setState (`curr => ...`)
 - Ternary conditionals (not &&)
-- StyleSheet.create only (no inline objects)
-- 44pt touch targets; SafeAreaView on all screens
-- Warm Ledger colors
-- expo-haptics impactAsync(Light) on sign out
-- LocalAuthentication.hasHardwareAsync() guards biometrics toggle
-- No credentials in source code (biometric pref → AsyncStorage, not SecureStore)
-- All secrets injected via GitHub Actions secrets only
+- Lazy useState init for date field
+- 44px min-height on all interactive elements
+- aria-labels on all controls
+- cursor-pointer on all clickable elements
+- Logic in hooks (sortBy state in useBudget, not FilterBar)
+- Readonly TypeScript props interfaces

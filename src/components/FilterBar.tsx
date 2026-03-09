@@ -1,10 +1,12 @@
-import { BudgetCategory } from "@shared/types/budget";
+import { BudgetCategory, SortOption } from "@shared/types/budget";
 
 interface FilterBarProps {
   active: BudgetCategory | 'all';
   onChange: (cat: BudgetCategory | 'all') => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
+  sortBy: SortOption;
+  onSortChange: (sort: SortOption) => void;
 }
 
 const filters: { label: string; value: BudgetCategory | 'all' }[] = [
@@ -14,9 +16,9 @@ const filters: { label: string; value: BudgetCategory | 'all' }[] = [
   { label: 'Savings', value: 'savings' },
 ];
 
-export const FilterBar = ({ active, onChange, searchQuery, onSearchChange }: Readonly<FilterBarProps>) => {
+export const FilterBar = ({ active, onChange, searchQuery, onSearchChange, sortBy, onSortChange }: Readonly<FilterBarProps>) => {
   return (
-    <div className="flex justify-between gap-4 mb-4">
+    <div className="flex flex-wrap justify-between gap-4 mb-4">
       <div className="flex gap-2">
         {filters.map((filter) => (
           <button
@@ -32,7 +34,20 @@ export const FilterBar = ({ active, onChange, searchQuery, onSearchChange }: Rea
           </button>
         ))}
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
+        <label htmlFor="sort-transactions" className="sr-only">Sort transactions</label>
+        <select
+          id="sort-transactions"
+          value={sortBy}
+          onChange={e => onSortChange(e.target.value as SortOption)}
+          aria-label="Sort transactions"
+          className="min-h-[44px] px-3 rounded-full text-sm border border-border text-ink bg-surface focus:outline-none focus:border-ink transition-colors duration-150 cursor-pointer"
+        >
+          <option value="date-desc">Newest First</option>
+          <option value="date-asc">Oldest First</option>
+          <option value="amount-desc">Amount High{'\u2013'}Low</option>
+          <option value="amount-asc">Amount Low{'\u2013'}High</option>
+        </select>
         <label htmlFor="search-transactions" className="sr-only">Search transactions</label>
         <input
           id="search-transactions"
