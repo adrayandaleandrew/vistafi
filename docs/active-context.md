@@ -1,11 +1,12 @@
-# Active Context — Phase 12b: Core Budget Screens
+# Active Context — Phase 12c: Polish, Realtime & Release
 
 ## Context
 
-Phase 12a (Expo Router migration + Supabase Auth + auth screens) is fully implemented and merged to master.
-Phase 12b implements full CRUD budget screens on mobile using TDD (Red-Green-Refactor).
+Phase 12b (Dashboard, Add, History, Edit screens) is merged to master. Phase 12c is the final
+mobile phase: Profile screen, Supabase Realtime sync, performance validation, EAS build config,
+and a mobile CI workflow.
 
-Branch: `feature/phase-12b-budget-screens`
+Branch: `feature/phase-12c-polish-realtime-release`
 
 ---
 
@@ -13,30 +14,31 @@ Branch: `feature/phase-12b-budget-screens`
 
 | # | Task | Status |
 |---|------|--------|
-| 12.5 RED | Failing tests — Dashboard Screen (index.tsx) | complete |
-| 12.5 GREEN | Dashboard Screen implementation | complete |
-| 12.6 RED | Failing tests — Add Transaction Screen (add.tsx) | complete |
-| 12.6 GREEN | Add Transaction Screen implementation | complete |
-| 12.7 RED | Failing tests — History + Edit screens | complete |
-| 12.7 GREEN | History + edit-transaction implementation | complete |
+| 12.8 RED | Failing tests — Profile Screen (profile.tsx) | complete |
+| 12.8 GREEN | Profile Screen implementation | complete |
+| 12.9 RED | Failing tests — Realtime subscription (useBudgetItems.ts) | complete |
+| 12.9 GREEN | useBudgetItems Realtime implementation | complete |
+| 12.10 | Performance audit (static checks + npm audit) | complete |
+| 12.11 | EAS build config + mobile CI workflow | complete |
 
 ---
 
 ## Architecture
 
-- `mobile/app/(tabs)/index.tsx` — Dashboard: summary cards + FlashList
-- `mobile/app/(tabs)/add.tsx` — Add Transaction: form with validation
-- `mobile/app/(tabs)/history.tsx` — History: filter + search + long-press
-- `mobile/app/edit-transaction.tsx` — Edit modal: pre-filled form
-- `mobile/src/components/TransactionItem.tsx` — React.memo list row (shared by Dashboard + History)
-- Tests in `mobile/app/(tabs)/__tests__/` and `mobile/app/__tests__/`
+- `mobile/app/(tabs)/profile.tsx` — Profile screen: email display, sign out, biometrics toggle
+- `mobile/app/(tabs)/__tests__/profile.test.tsx` — 7 tests for profile screen
+- `mobile/src/hooks/useBudgetItems.ts` — adds Realtime channel subscription + cleanup
+- `mobile/src/hooks/__tests__/useBudgetItems.test.ts` — 3 existing + 5 new Realtime tests
+- `mobile/eas.json` — EAS build config (development/preview/production)
+- `.github/workflows/mobile-ci.yml` — type-check + unit tests on push/PR
 
 ## Key Rules Applied
 - TDD iron law: failing test FIRST, no production code without failing test
-- FlashList only (no FlatList/ScrollView for lists) — estimatedItemSize={72}
-- React.memo on TransactionItem; useCallback on renderItem/keyExtractor
-- StyleSheet.create only (no inline objects in list items)
 - Ternary conditionals (not &&)
+- StyleSheet.create only (no inline objects)
 - 44pt touch targets; SafeAreaView on all screens
-- Warm Ledger colors: Income #0D7040, Expense #C1281A, Savings #1E52BB
-- Reanimated withSpring on submit buttons; expo-haptics on success
+- Warm Ledger colors
+- expo-haptics impactAsync(Light) on sign out
+- LocalAuthentication.hasHardwareAsync() guards biometrics toggle
+- No credentials in source code (biometric pref → AsyncStorage, not SecureStore)
+- All secrets injected via GitHub Actions secrets only

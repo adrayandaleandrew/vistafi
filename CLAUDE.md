@@ -125,5 +125,6 @@ docs/                     # Project standards — read before every task
 - Strict TypeScript: `noUnusedLocals`, `noUnusedParameters`
 
 ## Open TODOs
-- Phases 1–11 complete (v1.0.0)
+- Phases 1–12c complete
 - Phase 10+ backlog: font change (S2 — replace Inter), mobile viewport E2E, CSV export, date picker on Quick Add, sort transactions, budget goals
+- Phase 12c note: EAS build step in mobile-ci.yml requires user to run `eas init` once + add `EAS_TOKEN` to GitHub secrets before activating
