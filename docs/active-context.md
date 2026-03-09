@@ -1,14 +1,12 @@
-# Active Context — Phase 13: Sort, Date Picker & CSV Export
+# Active Context — Phase 14: Budget Goals + Mobile Viewport E2E
 
 ## Context
 
-Phase 12c is complete and merged. Phase 13 addresses four backlog items from the web app:
-- Sort transactions (newest-first default, 4 options)
-- Date picker on Quick Add (replace hardcoded today's date)
-- CSV export (client-side Blob download)
-- Font refresh (DM Sans body, activate Playfair Display headings)
+Phase 13 is complete and merged. Phase 14 delivers two backlog items:
+1. Budget goals — per-category monthly targets with progress bars in BudgetSummary
+2. Mobile viewport E2E — 4 Playwright tests at Pixel 5 viewport
 
-Branch: `feature/phase-13-sort-date-export`
+Branch: `feature/phase-14-budget-goals-mobile-e2e`
 
 ---
 
@@ -16,38 +14,55 @@ Branch: `feature/phase-13-sort-date-export`
 
 | # | Task | Status |
 |---|------|--------|
-| 13.1 RED | Failing tests — Sort transactions (filterBar + integration) | in progress |
-| 13.1 GREEN | Sort implementation (useBudget, FilterBar, App) | pending |
-| 13.2 RED | Failing tests — Date picker (budgetForm.test.tsx) | pending |
-| 13.2 GREEN | Date picker implementation (BudgetForm.tsx) | pending |
-| 13.3 RED | Failing tests — CSV export (csvExport.test.ts) | pending |
-| 13.3 GREEN | CSV export implementation (csvExport.ts + App.tsx) | pending |
-| 13.4 | Font refresh — DM Sans + Playfair Display (no TDD) | pending |
+| 14.1a RED | Failing tests — calculateCurrentMonthSummary (budgetUtils.test.ts, 3 new tests) | pending |
+| 14.1b RED | Failing tests — goalService (tests/unit/services/goalService.test.ts, 5 new tests) | pending |
+| 14.1c RED | Failing tests — BudgetSummary with goals/progress props (4 new + update 6 existing) | pending |
+| 14.1d RED | Failing tests — GoalModal component (5 new tests) | pending |
+| 14.1a GREEN | calculateCurrentMonthSummary in shared/utils/budgetUtils.ts | pending |
+| 14.1a GREEN | BudgetGoal type in shared/types/budget.ts | pending |
+| 14.1b GREEN | src/services/goalService.ts | pending |
+| 14.1c GREEN | Update src/components/BudgetSummary.tsx (goals + progress bars) | pending |
+| 14.1d GREEN | Create src/components/GoalModal.tsx | pending |
+| 14.1e GREEN | Create src/hooks/useGoals.ts | pending |
+| 14.1e GREEN | Create src/lib/migrations/002_budget_goals.sql | pending |
+| 14.1e GREEN | Update src/App.tsx (Goals button + GoalModal + useGoals) | pending |
+| 14.2 | Mobile viewport E2E (playwright.config.ts + tests/e2e/mobile.spec.ts) | pending |
 
 ---
 
 ## Architecture
 
-- `shared/types/budget.ts` — add `SortOption` type
-- `src/hooks/useBudget.ts` — add `sortBy` state + sort pipeline; expose `budgetItems`
-- `src/components/FilterBar.tsx` — add `sortBy`/`onSortChange` required props + sort select
-- `src/App.tsx` — pass sort props; add Export CSV button; apply display font to h1
-- `src/components/BudgetForm.tsx` — add `date` state + date input; apply display font to h2
-- `src/utils/csvExport.ts` — NEW: `generateCsv()` + `downloadCsv()`
-- `tests/unit/csvExport.test.ts` — NEW: 5 unit tests
-- `tests/unit/components/filterBar.test.tsx` — 6 existing renders updated + 5 new sort tests
-- `tests/unit/components/budgetForm.test.tsx` — 4 new date picker tests
-- `tests/integration/budgetFlows.test.tsx` — 2 new sort integration tests
-- `index.html` — replace Inter with DM Sans
-- `src/index.css` — update `--font-sans` + body font-family
+### New Files
+- `src/services/goalService.ts` — fetchGoals / upsertGoal / deleteGoal (Supabase)
+- `src/hooks/useGoals.ts` — goals state, handleSetGoal, handleDeleteGoal
+- `src/components/GoalModal.tsx` — 3-input modal (income/expense/savings targets)
+- `src/lib/migrations/002_budget_goals.sql` — budget_goals table + RLS
+- `tests/unit/services/goalService.test.ts` — 5 service tests
+- `tests/unit/components/goalModal.test.tsx` — 5 component tests
+- `tests/e2e/mobile.spec.ts` — 4 Playwright mobile viewport tests
+
+### Modified Files
+- `shared/types/budget.ts` — add BudgetGoal interface
+- `shared/utils/budgetUtils.ts` — add calculateCurrentMonthSummary()
+- `src/components/BudgetSummary.tsx` — add goals + currentMonthSummary props + progress bars
+- `src/App.tsx` — add Goals button, GoalModal, useGoals, calculateCurrentMonthSummary
+- `tests/unit/budgetUtils.test.ts` — 3 new calculateCurrentMonthSummary tests
+- `tests/unit/components/budgetSummary.test.tsx` — update 6 + add 4 tests
+- `playwright.config.ts` — add mobile-chrome project
+
+### Supabase Table
+```sql
+budget_goals (id, user_id, category, target_amount, created_at)
+unique(user_id, category) — upsert on conflict
+RLS: auth.uid() = user_id
+```
 
 ## Key Rules Applied
 - TDD iron law: failing test FIRST
 - Functional setState (`curr => ...`)
 - Ternary conditionals (not &&)
-- Lazy useState init for date field
+- Progress bars: role="progressbar", aria-label, aria-valuenow, aria-valuemin={0}, aria-valuemax={100}
 - 44px min-height on all interactive elements
 - aria-labels on all controls
-- cursor-pointer on all clickable elements
-- Logic in hooks (sortBy state in useBudget, not FilterBar)
 - Readonly TypeScript props interfaces
+- No console.log anywhere

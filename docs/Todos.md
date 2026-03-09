@@ -907,6 +907,32 @@ Web app backlog items: sort transactions, date picker on Quick Add, CSV export, 
 
 ---
 
+# Phase 14 — Budget Goals + Mobile Viewport E2E
+
+## Tasks
+
+| # | Task | Status |
+|---|------|--------|
+| 14.1a | `calculateCurrentMonthSummary` util + `BudgetGoal` type | ✅ |
+| 14.1b | `goalService.ts` (fetchGoals / upsertGoal / deleteGoal) | ✅ |
+| 14.1c | `BudgetSummary` — goals + currentMonthSummary props + progress bars | ✅ |
+| 14.1d | `GoalModal` — 3-input modal for monthly targets | ✅ |
+| 14.1e | `useGoals` hook + Goals button in App + migration SQL | ✅ |
+| 14.2 | Mobile viewport E2E — 4 Playwright tests (Pixel 5) | ✅ |
+
+## Done Criteria (Phase 14) ✅
+
+1. `calculateCurrentMonthSummary` filters items by month prefix and delegates to `calculateBudgetSummary`
+2. `BudgetGoal` interface exported from `shared/types/budget.ts`
+3. `goalService.ts` maps `target_amount` → `targetAmount`; upserts on `user_id,category` conflict
+4. `BudgetSummary` shows a `role="progressbar"` with `aria-label` for each category that has a goal
+5. `GoalModal` accepts 3 number inputs; empty inputs produce `null` targetAmount in onSave payload
+6. Goals button in header opens `GoalModal`; Cancel/Save dismiss it
+7. `tests/e2e/mobile.spec.ts` runs 4 tests against Pixel 5 viewport
+8. All 121 unit/integration tests pass; lint clean; build clean
+
+---
+
 # MVP SUCCESS CRITERIA
 
 MVP is successful if:
