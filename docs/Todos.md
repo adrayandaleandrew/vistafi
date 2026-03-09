@@ -963,6 +963,36 @@ Bring the budget goals feature to the mobile app (Expo/React Native), reaching p
 
 ---
 
+# Phase 16 — Advanced Analytics
+
+## Objective
+
+Add an Advanced Analytics panel to the web app: monthly trend bar chart, savings rate metric,
+and top expenses breakdown.
+
+---
+
+## Tasks
+
+| # | Task | Status |
+|---|------|--------|
+| 16.A | `MonthlyTrend` interface in `shared/types/budget.ts` | ✅ |
+| 16.B | `calculateMonthlyTrends`, `calculateSavingsRate`, `getTopExpenses` in `shared/utils/budgetUtils.ts` | ✅ |
+| 16.C | `src/components/AnalyticsPanel.tsx` — 3-card analytics UI | ✅ |
+| 16.D | Analytics toggle button in `src/App.tsx` with ternary panel switch | ✅ |
+| 16.E | 23 new tests (14 utility + 7 component + 2 integration) | ✅ |
+
+## Done Criteria (Phase 16) ✅
+
+1. `calculateMonthlyTrends(items, 6)` returns last 6 months ascending, each with income/expense/savings/balance
+2. `calculateSavingsRate(summary)` returns `(totalSavings / totalIncome) * 100`, rounded to 1 decimal; 0 when income=0
+3. `getTopExpenses(items, 5)` returns expense items sorted by amount descending, capped at limit
+4. `AnalyticsPanel` renders monthly bar chart, savings rate progress bar, and top expenses ranked list
+5. Analytics toggle button (`aria-label="Show analytics"` / `"Hide analytics"`) switches between panel and transactions view
+6. All 144 unit/integration tests pass; lint clean; build clean
+
+---
+
 # MVP SUCCESS CRITERIA
 
 MVP is successful if:

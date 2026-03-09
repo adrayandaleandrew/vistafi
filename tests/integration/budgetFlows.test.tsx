@@ -158,6 +158,40 @@ describe('Sort flows', () => {
   })
 })
 
+describe('Analytics panel', () => {
+  it('C1: Analytics button toggles AnalyticsPanel visibility', async () => {
+    // Given
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByText('Groceries')
+
+    // When — click Analytics toggle button
+    await user.click(screen.getByRole('button', { name: /analytics/i }))
+
+    // Then — AnalyticsPanel is visible
+    expect(screen.getByText('Monthly Trend')).toBeInTheDocument()
+
+    // When — click Hide analytics to hide analytics
+    await user.click(screen.getByRole('button', { name: /hide analytics/i }))
+
+    // Then — AnalyticsPanel is hidden
+    expect(screen.queryByText('Monthly Trend')).not.toBeInTheDocument()
+  })
+
+  it('C2: AnalyticsPanel shows correct savings rate calculated from mock items', async () => {
+    // Given — mockData: totalSavings=800, totalIncome=5200 → rate=15.4%
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByText('Groceries')
+
+    // When — open analytics
+    await user.click(screen.getByRole('button', { name: /analytics/i }))
+
+    // Then — savings rate shown
+    expect(screen.getByText('15.4%')).toBeInTheDocument()
+  })
+})
+
 describe('Filter and search flows', () => {
   it('should filter by category and leave summary unchanged', async () => {
     // Given

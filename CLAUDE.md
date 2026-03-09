@@ -125,6 +125,6 @@ docs/                     # Project standards — read before every task
 - Strict TypeScript: `noUnusedLocals`, `noUnusedParameters`
 
 ## Open TODOs
-- Phases 1–15 complete
-- Remaining backlog: advanced analytics, App Store / Google Play store submission
+- Phases 1–16 complete — no remaining backlog items
+- Future: App Store / Google Play store submission (EAS build in scope; store submission is a future phase)
 - Phase 12c note: EAS build step in mobile-ci.yml requires user to run `eas init` once + add `EAS_TOKEN` to GitHub secrets before activating

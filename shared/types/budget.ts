@@ -22,3 +22,11 @@ export interface BudgetGoal {
   category: BudgetCategory;
   targetAmount: number;
 }
+
+export interface MonthlyTrend {
+  month: string;
+  totalIncome: number;
+  totalExpenses: number;
+  totalSavings: number;
+  balance: number;
+}

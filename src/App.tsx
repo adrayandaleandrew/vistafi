@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { BudgetForm } from './components/BudgetForm';
 import { BudgetItemList } from './components/BudgetItemList';
 import { BudgetSummary } from './components/BudgetSummary';
 import { FilterBar } from './components/FilterBar';
 import { EditModal } from './components/EditModal';
 import { GoalModal } from './components/GoalModal';
+import { AnalyticsPanel } from './components/AnalyticsPanel';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { useAuth } from './context/AuthContext';
@@ -36,7 +37,10 @@ function BudgetApp() {
 
   const { goals, handleSetGoal, handleDeleteGoal } = useGoals();
   const [goalsOpen, setGoalsOpen] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const currentMonthSummary = calculateCurrentMonthSummary(budgetItems);
+
+  const handleToggleAnalytics = useCallback(() => setShowAnalytics(curr => !curr), []);
 
   const { signOut } = useAuth();
 
@@ -77,6 +81,15 @@ function BudgetApp() {
             ) : null}
             <button
               type="button"
+              onClick={handleToggleAnalytics}
+              aria-label={showAnalytics ? 'Hide analytics' : 'Show analytics'}
+              aria-pressed={showAnalytics}
+              className="min-h-[44px] px-4 text-sm text-muted hover:text-ink cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-lg"
+            >
+              {showAnalytics ? 'Transactions' : 'Analytics'}
+            </button>
+            <button
+              type="button"
               onClick={() => setGoalsOpen(true)}
               aria-label="Set monthly goals"
               className="min-h-[44px] px-4 text-sm text-muted hover:text-ink cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-lg"
@@ -96,24 +109,28 @@ function BudgetApp() {
 
         <BudgetSummary summary={summary} goals={goals} currentMonthSummary={currentMonthSummary} />
 
-        <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6 mt-8">
-          <BudgetForm onAddItem={handleAddItem} />
-          <div>
-            <FilterBar
-              active={filterCategory}
-              onChange={setFilterCategory}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-            />
-            <BudgetItemList
-              items={filteredItems}
-              onDeleteItem={handleDeleteItem}
-              onEditItem={handleEditItem}
-            />
+        {showAnalytics ? (
+          <AnalyticsPanel items={budgetItems} summary={summary} />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6 mt-8">
+            <BudgetForm onAddItem={handleAddItem} />
+            <div>
+              <FilterBar
+                active={filterCategory}
+                onChange={setFilterCategory}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+              />
+              <BudgetItemList
+                items={filteredItems}
+                onDeleteItem={handleDeleteItem}
+                onEditItem={handleEditItem}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {itemToEdit ? (
