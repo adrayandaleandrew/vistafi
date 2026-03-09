@@ -933,6 +933,36 @@ Web app backlog items: sort transactions, date picker on Quick Add, CSV export, 
 
 ---
 
+# Phase 15 — Mobile Goals
+
+## Objective
+
+Bring the budget goals feature to the mobile app (Expo/React Native), reaching parity with the web goals feature from Phase 14.
+
+---
+
+## Tasks
+
+| # | Task | Status |
+|---|------|--------|
+| 15.A | `mobile/src/services/goalService.ts` — fetchGoals / upsertGoal / deleteGoal | ✅ |
+| 15.B | `mobile/src/hooks/useGoals.ts` — useGoals / useSetGoal / useDeleteGoal | ✅ |
+| 15.C | `mobile/app/set-goals.tsx` — modal screen (3 inputs, save/cancel) | ✅ |
+| 15.D | `mobile/app/(tabs)/index.tsx` — Goals button + GoalProgress sub-component | ✅ |
+| 15.E | `mobile/app/_layout.tsx` — register set-goals as modal Stack.Screen | ✅ |
+
+## Done Criteria (Phase 15) ✅
+
+1. `goalService` maps `target_amount` → `targetAmount`; upserts on `user_id,category` conflict; reuses Phase 14 Supabase table
+2. `useGoals`, `useSetGoal`, `useDeleteGoal` hooks with optimistic updates and rollback
+3. `set-goals.tsx` modal screen pre-fills existing goal values; save/cancel wired correctly
+4. Dashboard shows a "Goals" Pressable (minHeight: 44) that navigates to `/set-goals`
+5. Per-category progress bars render when a goal exists for that category
+6. All 15 new tests pass (5 service + 5 hook + 5 screen); 11 dashboard tests pass
+7. All 121 web unit/integration tests remain passing
+
+---
+
 # MVP SUCCESS CRITERIA
 
 MVP is successful if:
