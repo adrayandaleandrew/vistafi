@@ -587,24 +587,24 @@ production deps, and fully functional auth flow using the same Supabase project 
 
 ### 12.1 — Expo Router Migration
 
-- [ ] Remove legacy scaffold: `mobile/App.tsx`, `mobile/src/navigation/AppNavigator.tsx`
-- [ ] Install Expo Router + deps: `expo-router`, `expo-status-bar`, `react-native-safe-area-context`, `react-native-screens`
-- [ ] Install auth + storage: `@supabase/supabase-js`, `@react-native-async-storage/async-storage`, `expo-secure-store`
-- [ ] Install offline + data: `@tanstack/react-query`, `@tanstack/react-query-persist-client`, `@tanstack/query-async-storage-persister`, `@react-native-community/netinfo`
-- [ ] Install UI/animation: `@shopify/flash-list`, `react-native-reanimated`, `react-native-gesture-handler`, `expo-haptics`, `expo-local-authentication` (optional biometrics)
-- [ ] Update `mobile/app.json`: `"main": "expo-router/entry"`, add `"scheme": "vistafi"`
-- [ ] Create `mobile/app/_layout.tsx` — root layout wrapping `<QueryProvider>`, `<AuthProvider>`, `<Stack>`
-- [ ] Create `mobile/app/(auth)/_layout.tsx` — stack for login/signup screens
-- [ ] Create `mobile/app/(tabs)/_layout.tsx` — bottom tab navigator with **native tabs** (not JS navigator — `vercel-react-native-skills` rule)
-- [ ] Add `@shared` path alias to `mobile/tsconfig.json` and `mobile/metro.config.js`
-- [ ] Verify `expo start` resolves all routes
+- [x] Remove legacy scaffold: `mobile/App.tsx`, `mobile/src/navigation/AppNavigator.tsx`
+- [x] Install Expo Router + deps: `expo-router`, `expo-status-bar`, `react-native-safe-area-context`, `react-native-screens`
+- [x] Install auth + storage: `@supabase/supabase-js`, `@react-native-async-storage/async-storage`, `expo-secure-store`
+- [x] Install offline + data: `@tanstack/react-query`, `@tanstack/react-query-persist-client`, `@tanstack/query-async-storage-persister`, `@react-native-community/netinfo`
+- [x] Install UI/animation: `@shopify/flash-list`, `react-native-reanimated`, `react-native-gesture-handler`, `expo-haptics`, `expo-local-authentication` (optional biometrics)
+- [x] Update `mobile/app.json`: `"main": "expo-router/entry"`, add `"scheme": "vistafi"`
+- [x] Create `mobile/app/_layout.tsx` — root layout wrapping `<QueryProvider>`, `<AuthProvider>`, `<Stack>`
+- [x] Create `mobile/app/(auth)/_layout.tsx` — stack for login/signup screens
+- [x] Create `mobile/app/(tabs)/_layout.tsx` — bottom tab navigator with **native tabs** (not JS navigator — `vercel-react-native-skills` rule)
+- [x] Add `@shared` path alias to `mobile/tsconfig.json` and `mobile/metro.config.js`
+- [x] Verify `expo start` resolves all routes
 
 ### 12.2 — Mobile AuthProvider (TDD)
 
 > TDD: write failing tests before implementing.
 
-- [ ] Create `mobile/src/lib/supabase.ts` — Supabase singleton with AsyncStorage session adapter
-- [ ] Create `mobile/src/providers/AuthProvider.tsx`:
+- [x] Create `mobile/src/lib/supabase.ts` — Supabase singleton with AsyncStorage session adapter
+- [x] Create `mobile/src/providers/AuthProvider.tsx`:
   - On mount: `supabase.auth.getSession()` to restore persisted session
   - `supabase.auth.onAuthStateChange` listener to keep `user` state in sync
   - `signIn`: `supabase.auth.signInWithPassword({ email, password })`
@@ -617,15 +617,15 @@ production deps, and fully functional auth flow using the same Supabase project 
 
 > TDD: write failing tests for hooks before implementing.
 
-- [ ] Create `mobile/src/providers/QueryProvider.tsx`:
+- [x] Create `mobile/src/providers/QueryProvider.tsx`:
   - `QueryClient`: `gcTime: 86400000`, `staleTime: 300000`, `networkMode: 'offlineFirst'`
   - `createAsyncStoragePersister` with `AsyncStorage`, key `'VISTAFI_QUERY_CACHE'`
   - `PersistQueryClientProvider` wrapping children
   - `NetInfo.addEventListener` → `onlineManager.setEventListener`
-- [ ] Create `mobile/src/hooks/useBudgetItems.ts`:
+- [x] Create `mobile/src/hooks/useBudgetItems.ts`:
   - `useQuery(['budgetItems', userId])` → calls `budgetService.fetchItems` (reused from `shared/`)
   - Ternary for loading/error/data states (not `&&` — `vercel-react-native-skills` rule)
-- [ ] Create `mobile/src/hooks/useBudgetMutations.ts`:
+- [x] Create `mobile/src/hooks/useBudgetMutations.ts`:
   - `useAddItem`, `useUpdateItem`, `useDeleteItem` — each with optimistic updates via `onMutate`
   - All rollback on error; all `queryClient.invalidateQueries` on settle
   - All use `useCallback` for stable references
@@ -634,7 +634,7 @@ production deps, and fully functional auth flow using the same Supabase project 
 
 > TDD: write failing tests before implementing.
 
-- [ ] Create `mobile/app/(auth)/login.tsx`:
+- [x] Create `mobile/app/(auth)/login.tsx`:
   - Controlled `TextInput` for email (`keyboardType="email-address"`), password (`secureTextEntry`)
   - All styles in `StyleSheet.create` (no inline objects)
   - 44pt touch targets on all interactive elements (`react-native-design` rule)
@@ -643,7 +643,7 @@ production deps, and fully functional auth flow using the same Supabase project 
   - `expo-haptics` light on successful sign-in
   - Inline error when `useAuth().error` is set
   - `SafeAreaView` wrapping the screen
-- [ ] Create `mobile/app/(auth)/signup.tsx` — same patterns; passwords-match validation
+- [x] Create `mobile/app/(auth)/signup.tsx` — same patterns; passwords-match validation
 
 ---
 
