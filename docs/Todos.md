@@ -701,7 +701,7 @@ as the web app.
 
 > TDD: write failing tests before implementing.
 
-- [ ] Create `mobile/app/(tabs)/index.tsx`:
+- [x] Create `mobile/app/(tabs)/index.tsx`:
   - Summary cards: Balance, Income, Expenses, Savings — uses `calculateBudgetSummary()` from `shared/utils/budgetUtils.ts`
   - Amounts formatted as `$0.00` with `fontVariant: ['tabular-nums']` in StyleSheet
   - Colors from Warm Ledger: Income `#0D7040`, Expense `#C1281A`, Savings `#1E52BB`
@@ -719,7 +719,7 @@ as the web app.
 
 > TDD: write failing tests before implementing.
 
-- [ ] Create `mobile/app/(tabs)/add.tsx`:
+- [x] Create `mobile/app/(tabs)/add.tsx`:
   - Description: controlled `TextInput`
   - Amount: controlled `TextInput` (`keyboardType="decimal-pad"`)
   - Category: segmented control with three `Pressable` items (Income / Expense / Savings)
@@ -732,14 +732,14 @@ as the web app.
 
 ### 12.7 — History + Edit (History Tab) (TDD)
 
-- [ ] Create `mobile/app/(tabs)/history.tsx`:
+- [x] Create `mobile/app/(tabs)/history.tsx`:
   - Category filter pills (All / Income / Expense / Savings) as `Pressable` row
   - Text search input (controlled, filters description case-insensitive)
   - `FlashList` for virtualized list
   - Long-press on transaction row → native action sheet with "Edit" and "Delete" options
   - "Edit" → push to `mobile/app/edit-transaction.tsx` (modal presentation)
   - "Delete" → calls `useDeleteItem` with `expo-haptics` medium feedback
-- [ ] Create `mobile/app/edit-transaction.tsx` — modal screen:
+- [x] Create `mobile/app/edit-transaction.tsx` — modal screen:
   - Pre-fills all fields from selected `BudgetItem`
   - Same validation as Add screen
   - On save: `useUpdateItem`, `expo-haptics` success, dismiss modal

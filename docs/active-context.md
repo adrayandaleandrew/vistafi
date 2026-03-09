@@ -1,13 +1,11 @@
-# Active Context — Phase 12 Planning (chore/phase-12-planning)
+# Active Context — Phase 12b: Core Budget Screens
 
 ## Context
 
-Phase 11 (Supabase Auth + cloud persistence) is fully implemented and merged to master.
-This chore branch closes all Phase 11 checkboxes in `docs/Todos.md`, restructures the
-monolithic Phase 12 spec into three independently deliverable sub-phases (12a / 12b / 12c),
-and corrects all Better Auth references to Supabase Auth throughout Phase 12.
+Phase 12a (Expo Router migration + Supabase Auth + auth screens) is fully implemented and merged to master.
+Phase 12b implements full CRUD budget screens on mobile using TDD (Red-Green-Refactor).
 
-Branch: `chore/phase-12-planning`
+Branch: `feature/phase-12b-budget-screens`
 
 ---
 
@@ -15,22 +13,30 @@ Branch: `chore/phase-12-planning`
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Check all Phase 11 `[ ]` → `[x]` in `docs/Todos.md` | complete |
-| 2 | Replace Phase 12 monolith with sub-phases 12a / 12b / 12c in `docs/Todos.md` | complete |
-| 3 | Update `CLAUDE.md` Open TODOs: "Phases 1–10" → "Phases 1–11" | complete |
-| 4 | Update `docs/active-context.md` with this plan | complete |
+| 12.5 RED | Failing tests — Dashboard Screen (index.tsx) | complete |
+| 12.5 GREEN | Dashboard Screen implementation | complete |
+| 12.6 RED | Failing tests — Add Transaction Screen (add.tsx) | complete |
+| 12.6 GREEN | Add Transaction Screen implementation | complete |
+| 12.7 RED | Failing tests — History + Edit screens | complete |
+| 12.7 GREEN | History + edit-transaction implementation | complete |
 
 ---
 
-## Key Decisions
+## Architecture
 
-- Phase 12 split into three independently deliverable sub-phases:
-  - **12a** — Mobile Foundation & Auth (Tasks 12.1–12.4): Expo Router + Supabase Auth on simulators
-  - **12b** — Core Budget Screens (Tasks 12.5–12.7): Full CRUD on mobile
-  - **12c** — Polish, Realtime & Release (Tasks 12.8–12.11): EAS build, Realtime sync, perf targets
-- All Better Auth references removed — Phase 12 uses Supabase Auth (`@supabase/supabase-js`) throughout
-- Mobile session storage: `@supabase/supabase-js` with AsyncStorage adapter (standard RN pattern)
-  — replaces the original spec's "SecureStore only, never AsyncStorage" for auth tokens
-- Mobile env vars: `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_ANON_KEY`
-  — replaces `EXPO_PUBLIC_API_URL` / `BETTER_AUTH_URL`
-- No production code changed — docs-only branch
+- `mobile/app/(tabs)/index.tsx` — Dashboard: summary cards + FlashList
+- `mobile/app/(tabs)/add.tsx` — Add Transaction: form with validation
+- `mobile/app/(tabs)/history.tsx` — History: filter + search + long-press
+- `mobile/app/edit-transaction.tsx` — Edit modal: pre-filled form
+- `mobile/src/components/TransactionItem.tsx` — React.memo list row (shared by Dashboard + History)
+- Tests in `mobile/app/(tabs)/__tests__/` and `mobile/app/__tests__/`
+
+## Key Rules Applied
+- TDD iron law: failing test FIRST, no production code without failing test
+- FlashList only (no FlatList/ScrollView for lists) — estimatedItemSize={72}
+- React.memo on TransactionItem; useCallback on renderItem/keyExtractor
+- StyleSheet.create only (no inline objects in list items)
+- Ternary conditionals (not &&)
+- 44pt touch targets; SafeAreaView on all screens
+- Warm Ledger colors: Income #0D7040, Expense #C1281A, Savings #1E52BB
+- Reanimated withSpring on submit buttons; expo-haptics on success
