@@ -1,12 +1,10 @@
-# Active Context — Phase 14: Budget Goals + Mobile Viewport E2E
+# Active Context — Phase 15: Mobile Goals
 
 ## Context
 
-Phase 13 is complete and merged. Phase 14 delivers two backlog items:
-1. Budget goals — per-category monthly targets with progress bars in BudgetSummary
-2. Mobile viewport E2E — 4 Playwright tests at Pixel 5 viewport
+Phase 14 is complete and merged. Phase 15 brings the goals feature to the mobile app (Expo/React Native), reaching parity with the web goals feature introduced in Phase 14.
 
-Branch: `feature/phase-14-budget-goals-mobile-e2e`
+Branch: `feature/phase-15-mobile-goals`
 
 ---
 
@@ -14,55 +12,43 @@ Branch: `feature/phase-14-budget-goals-mobile-e2e`
 
 | # | Task | Status |
 |---|------|--------|
-| 14.1a RED | Failing tests — calculateCurrentMonthSummary (budgetUtils.test.ts, 3 new tests) | pending |
-| 14.1b RED | Failing tests — goalService (tests/unit/services/goalService.test.ts, 5 new tests) | pending |
-| 14.1c RED | Failing tests — BudgetSummary with goals/progress props (4 new + update 6 existing) | pending |
-| 14.1d RED | Failing tests — GoalModal component (5 new tests) | pending |
-| 14.1a GREEN | calculateCurrentMonthSummary in shared/utils/budgetUtils.ts | pending |
-| 14.1a GREEN | BudgetGoal type in shared/types/budget.ts | pending |
-| 14.1b GREEN | src/services/goalService.ts | pending |
-| 14.1c GREEN | Update src/components/BudgetSummary.tsx (goals + progress bars) | pending |
-| 14.1d GREEN | Create src/components/GoalModal.tsx | pending |
-| 14.1e GREEN | Create src/hooks/useGoals.ts | pending |
-| 14.1e GREEN | Create src/lib/migrations/002_budget_goals.sql | pending |
-| 14.1e GREEN | Update src/App.tsx (Goals button + GoalModal + useGoals) | pending |
-| 14.2 | Mobile viewport E2E (playwright.config.ts + tests/e2e/mobile.spec.ts) | pending |
+| 15.A RED | goalService tests (5 tests) | pending |
+| 15.A GREEN | `mobile/src/services/goalService.ts` | pending |
+| 15.B RED | useGoals hook tests (5 tests) | pending |
+| 15.B GREEN | `mobile/src/hooks/useGoals.ts` | pending |
+| 15.C RED | set-goals screen tests (5 tests) | pending |
+| 15.C GREEN | `mobile/app/set-goals.tsx` | pending |
+| 15.D RED | Dashboard goals tests (4 new tests) | pending |
+| 15.D GREEN | Modify `mobile/app/(tabs)/index.tsx` | pending |
+| 15.E | Register set-goals in `mobile/app/_layout.tsx` | pending |
 
 ---
 
 ## Architecture
 
 ### New Files
-- `src/services/goalService.ts` — fetchGoals / upsertGoal / deleteGoal (Supabase)
-- `src/hooks/useGoals.ts` — goals state, handleSetGoal, handleDeleteGoal
-- `src/components/GoalModal.tsx` — 3-input modal (income/expense/savings targets)
-- `src/lib/migrations/002_budget_goals.sql` — budget_goals table + RLS
-- `tests/unit/services/goalService.test.ts` — 5 service tests
-- `tests/unit/components/goalModal.test.tsx` — 5 component tests
-- `tests/e2e/mobile.spec.ts` — 4 Playwright mobile viewport tests
+- `mobile/src/services/goalService.ts` — fetchGoals / upsertGoal / deleteGoal (Supabase)
+- `mobile/src/services/__tests__/goalService.test.ts` — 5 service tests
+- `mobile/src/hooks/useGoals.ts` — useGoals / useSetGoal / useDeleteGoal (React Query)
+- `mobile/src/hooks/__tests__/useGoals.test.ts` — 5 hook tests
+- `mobile/app/set-goals.tsx` — modal screen (3 text inputs, save/cancel)
+- `mobile/app/__tests__/set-goals.test.tsx` — 5 screen tests
 
 ### Modified Files
-- `shared/types/budget.ts` — add BudgetGoal interface
-- `shared/utils/budgetUtils.ts` — add calculateCurrentMonthSummary()
-- `src/components/BudgetSummary.tsx` — add goals + currentMonthSummary props + progress bars
-- `src/App.tsx` — add Goals button, GoalModal, useGoals, calculateCurrentMonthSummary
-- `tests/unit/budgetUtils.test.ts` — 3 new calculateCurrentMonthSummary tests
-- `tests/unit/components/budgetSummary.test.tsx` — update 6 + add 4 tests
-- `playwright.config.ts` — add mobile-chrome project
+- `mobile/app/(tabs)/index.tsx` — add Goals button + GoalProgress sub-component + per-category progress bars
+- `mobile/app/(tabs)/__tests__/index.test.tsx` — add 4 new tests (tests 8–11)
+- `mobile/app/_layout.tsx` — register `set-goals` as modal Stack.Screen
 
 ### Supabase Table
-```sql
-budget_goals (id, user_id, category, target_amount, created_at)
-unique(user_id, category) — upsert on conflict
-RLS: auth.uid() = user_id
-```
+- Reuses `budget_goals` table from Phase 14 (same schema, same RLS)
+- Mobile goalService maps `target_amount` → `targetAmount` same as web
 
 ## Key Rules Applied
 - TDD iron law: failing test FIRST
 - Functional setState (`curr => ...`)
 - Ternary conditionals (not &&)
-- Progress bars: role="progressbar", aria-label, aria-valuenow, aria-valuemin={0}, aria-valuemax={100}
-- 44px min-height on all interactive elements
-- aria-labels on all controls
-- Readonly TypeScript props interfaces
-- No console.log anywhere
+- All interactive elements minHeight: 44
+- useCallback on all callbacks
+- React.memo on GoalProgress sub-component
+- No console.log, no inline styles, no TouchableOpacity
+- StyleSheet.create only — Warm Ledger tokens

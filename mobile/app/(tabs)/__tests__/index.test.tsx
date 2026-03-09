@@ -18,9 +18,16 @@ jest.mock('../../../src/hooks/useBudgetMutations', () => ({
   useDeleteItem: () => ({ mutate: jest.fn(), isPending: false }),
 }))
 
+// Mock useGoals (Phase 15)
+const mockUseGoals = jest.fn()
+jest.mock('../../../src/hooks/useGoals', () => ({
+  useGoals: (...args: unknown[]) => mockUseGoals(...args),
+}))
+
 // Mock expo-router
+const mockPush = jest.fn()
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn() }),
+  useRouter: () => ({ push: mockPush, replace: jest.fn() }),
 }))
 
 // Mock react-native-safe-area-context
@@ -53,6 +60,7 @@ const mockItems: BudgetItem[] = [
 describe('DashboardScreen (12.5)', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseGoals.mockReturnValue({ data: [] })
   })
 
   test('1. shows loading indicator when isLoading is true', () => {
@@ -119,5 +127,56 @@ describe('DashboardScreen (12.5)', () => {
     const { getByTestId } = render(<DashboardScreen />)
     // Then
     expect(getByTestId('summary-income').props.children).toContain('$5000.00')
+  })
+})
+
+describe('Goals (15)', () => {
+  const today = new Date().toISOString().slice(0, 10)
+  const currentMonthItems = [
+    { id: '1', description: 'Salary', amount: 3000, category: 'income' as const, date: today },
+    { id: '2', description: 'Rent', amount: 1200, category: 'expense' as const, date: today },
+  ]
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseBudgetItems.mockReturnValue({ isLoading: false, data: currentMonthItems, isError: false, refetch: jest.fn() })
+    mockUseGoals.mockReturnValue({ data: [] })
+  })
+
+  test('8. Goals button renders with testID="goals-button"', () => {
+    // Given/When
+    const { getByTestId } = render(<DashboardScreen />)
+    // Then
+    expect(getByTestId('goals-button')).toBeTruthy()
+  })
+
+  test('9. Income progress bar renders when income goal exists (testID="goal-progress-income")', () => {
+    // Given
+    mockUseGoals.mockReturnValue({
+      data: [{ id: 'g1', category: 'income', targetAmount: 5000 }],
+    })
+    // When
+    const { getByTestId } = render(<DashboardScreen />)
+    // Then
+    expect(getByTestId('goal-progress-income')).toBeTruthy()
+  })
+
+  test('10. Progress bar absent when no goal for that category', () => {
+    // Given — no goals set
+    mockUseGoals.mockReturnValue({ data: [] })
+    // When
+    const { queryByTestId } = render(<DashboardScreen />)
+    // Then
+    expect(queryByTestId('goal-progress-income')).toBeNull()
+  })
+
+  test('11. Goals button minHeight is 44', () => {
+    // Given/When
+    const { getByTestId } = render(<DashboardScreen />)
+    const btn = getByTestId('goals-button')
+    const style = btn.props.style
+    const flatStyle = Array.isArray(style) ? Object.assign({}, ...style) : style
+    // Then
+    expect(flatStyle.minHeight).toBe(44)
   })
 })
