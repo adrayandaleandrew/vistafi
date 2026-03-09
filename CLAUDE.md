@@ -125,6 +125,6 @@ docs/                     # Project standards — read before every task
 - Strict TypeScript: `noUnusedLocals`, `noUnusedParameters`
 
 ## Open TODOs
-- Phases 1–13 complete
-- Remaining backlog: mobile viewport E2E, budget goals
+- Phases 1–14 complete
+- Remaining backlog: budget goal delete UI (currently done via upsert with null), advanced analytics
 - Phase 12c note: EAS build step in mobile-ci.yml requires user to run `eas init` once + add `EAS_TOKEN` to GitHub secrets before activating

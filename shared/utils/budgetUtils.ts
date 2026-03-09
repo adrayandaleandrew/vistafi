@@ -18,6 +18,15 @@ export const calculateBudgetSummary = (items: BudgetItem[]): BudgetSummary => {
     return { totalIncome, totalExpenses, totalSavings, balance };
 };
 
+export const calculateCurrentMonthSummary = (
+  items: BudgetItem[],
+  month: string = new Date().toISOString().slice(0, 7),
+): BudgetSummary => {
+  return calculateBudgetSummary(
+    items.filter(item => item.date.startsWith(month))
+  );
+};
+
 export const generateId = (): string => {
     return Math.random().toString(36).substring(2, 9);
 };

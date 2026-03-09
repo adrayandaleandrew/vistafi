@@ -16,3 +16,9 @@ export interface BudgetSummary {
 }
 
 export type SortOption = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc';
+
+export interface BudgetGoal {
+  id: string;
+  category: BudgetCategory;
+  targetAmount: number;
+}

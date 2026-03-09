@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculateBudgetSummary, generateId } from '@shared/utils/budgetUtils'
+import { calculateBudgetSummary, calculateCurrentMonthSummary, generateId } from '@shared/utils/budgetUtils'
 import { BudgetItem } from '@shared/types/budget'
 
 const makeItem = (overrides: Partial<BudgetItem> & Pick<BudgetItem, 'category' | 'amount'>): BudgetItem =>
@@ -107,6 +107,54 @@ describe('calculateBudgetSummary', () => {
     ]
     const { balance } = calculateBudgetSummary(items)
     expect(balance).toBeCloseTo(66.66, 2)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// calculateCurrentMonthSummary
+// ---------------------------------------------------------------------------
+
+describe('calculateCurrentMonthSummary', () => {
+  it('returns zeros when all items are in a different month', () => {
+    // Given — items all from 2023-11, filtering for 2024-01
+    const items: BudgetItem[] = [
+      { id: '1', description: 'Salary', amount: 4000, category: 'income', date: '2023-11-01' },
+      { id: '2', description: 'Rent', amount: 1500, category: 'expense', date: '2023-11-05' },
+    ]
+    // When
+    const result = calculateCurrentMonthSummary(items, '2024-01')
+    // Then
+    expect(result).toEqual({ totalIncome: 0, totalExpenses: 0, totalSavings: 0, balance: 0 })
+  })
+
+  it('sums only items matching the given month string', () => {
+    // Given — mixed months
+    const items: BudgetItem[] = [
+      { id: '1', description: 'Salary', amount: 4000, category: 'income', date: '2024-01-01' },
+      { id: '2', description: 'Bonus', amount: 500, category: 'income', date: '2024-02-15' },
+      { id: '3', description: 'Rent', amount: 1500, category: 'expense', date: '2024-01-05' },
+    ]
+    // When
+    const result = calculateCurrentMonthSummary(items, '2024-01')
+    // Then
+    expect(result).toEqual({
+      totalIncome: 4000,
+      totalExpenses: 1500,
+      totalSavings: 0,
+      balance: 2500,
+    })
+  })
+
+  it('uses current month by default when no month arg is provided', () => {
+    // Given — item dated in current month
+    const currentMonth = new Date().toISOString().slice(0, 7)
+    const items: BudgetItem[] = [
+      { id: '1', description: 'Salary', amount: 3000, category: 'income', date: `${currentMonth}-01` },
+    ]
+    // When — no month arg, defaults to current month
+    const result = calculateCurrentMonthSummary(items)
+    // Then
+    expect(result.totalIncome).toBe(3000)
   })
 })
 

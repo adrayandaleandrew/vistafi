@@ -4,11 +4,14 @@ import { BudgetItemList } from './components/BudgetItemList';
 import { BudgetSummary } from './components/BudgetSummary';
 import { FilterBar } from './components/FilterBar';
 import { EditModal } from './components/EditModal';
+import { GoalModal } from './components/GoalModal';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { useAuth } from './context/AuthContext';
 import { useBudget } from './hooks/useBudget';
+import { useGoals } from './hooks/useGoals';
 import { generateCsv, downloadCsv } from './utils/csvExport';
+import { calculateCurrentMonthSummary } from '@shared/utils/budgetUtils';
 
 function BudgetApp() {
   const {
@@ -30,6 +33,10 @@ function BudgetApp() {
     handleSaveEdit,
     handleCancelEdit,
   } = useBudget();
+
+  const { goals, handleSetGoal, handleDeleteGoal } = useGoals();
+  const [goalsOpen, setGoalsOpen] = useState(false);
+  const currentMonthSummary = calculateCurrentMonthSummary(budgetItems);
 
   const { signOut } = useAuth();
 
@@ -70,6 +77,14 @@ function BudgetApp() {
             ) : null}
             <button
               type="button"
+              onClick={() => setGoalsOpen(true)}
+              aria-label="Set monthly goals"
+              className="min-h-[44px] px-4 text-sm text-muted hover:text-ink cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-lg"
+            >
+              Goals
+            </button>
+            <button
+              type="button"
               onClick={signOut}
               aria-label="Sign out"
               className="min-h-[44px] px-4 text-sm text-muted hover:text-ink cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-lg"
@@ -79,7 +94,7 @@ function BudgetApp() {
           </div>
         </header>
 
-        <BudgetSummary summary={summary} />
+        <BudgetSummary summary={summary} goals={goals} currentMonthSummary={currentMonthSummary} />
 
         <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6 mt-8">
           <BudgetForm onAddItem={handleAddItem} />
@@ -106,6 +121,26 @@ function BudgetApp() {
           item={itemToEdit}
           onSave={handleSaveEdit}
           onCancel={handleCancelEdit}
+        />
+      ) : null}
+
+      {goalsOpen ? (
+        <GoalModal
+          goals={goals}
+          onSave={(updates) => {
+            updates.forEach(u => {
+              if (u.targetAmount !== null) {
+                handleSetGoal(u.category, u.targetAmount).catch(() => undefined);
+              } else {
+                const existing = goals.find(g => g.category === u.category);
+                if (existing) {
+                  handleDeleteGoal(existing.id).catch(() => undefined);
+                }
+              }
+            });
+            setGoalsOpen(false);
+          }}
+          onCancel={() => setGoalsOpen(false)}
         />
       ) : null}
     </div>
