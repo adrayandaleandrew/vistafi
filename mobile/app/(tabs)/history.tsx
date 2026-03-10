@@ -6,9 +6,9 @@ import {
   Pressable,
   StyleSheet,
   Modal,
+  FlatList,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { FlashList } from '@shopify/flash-list'
 import * as Haptics from 'expo-haptics'
 import { useRouter } from 'expo-router'
 import { useAuth } from '../../src/providers/AuthProvider'
@@ -131,11 +131,10 @@ export default function HistoryScreen() {
           <Text style={styles.emptyText}>No transactions match your filter.</Text>
         </View>
       ) : (
-        <FlashList
+        <FlatList
           data={filtered}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
-          estimatedItemSize={72}
         />
       )}
 

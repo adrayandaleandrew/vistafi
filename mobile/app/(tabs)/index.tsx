@@ -6,9 +6,9 @@ import {
   StyleSheet,
   Platform,
   Pressable,
+  FlatList,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { FlashList } from '@shopify/flash-list'
 import { useRouter } from 'expo-router'
 import { useAuth } from '../../src/providers/AuthProvider'
 import { useBudgetItems } from '../../src/hooks/useBudgetItems'
@@ -150,11 +150,10 @@ export default function DashboardScreen() {
             </Text>
           </View>
         ) : (
-          <FlashList
+          <FlatList
             data={items}
             keyExtractor={keyExtractor}
             renderItem={renderItem}
-            estimatedItemSize={72}
             onRefresh={handleRefresh}
             refreshing={refreshing}
           />
