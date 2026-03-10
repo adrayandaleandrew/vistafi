@@ -44,12 +44,6 @@ jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: { children: React.ReactNode }) => children,
 }))
 
-// Mock @shopify/flash-list
-jest.mock('@shopify/flash-list', () => {
-  const { FlatList } = require('react-native')
-  return { FlashList: FlatList }
-})
-
 import HistoryScreen from '../history'
 import type { BudgetItem } from '../../../../shared/types/budget'
 

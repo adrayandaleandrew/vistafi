@@ -36,12 +36,6 @@ jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: { children: React.ReactNode }) => children,
 }))
 
-// Mock @shopify/flash-list
-jest.mock('@shopify/flash-list', () => {
-  const { FlatList } = require('react-native')
-  return { FlashList: FlatList }
-})
-
 // Mock react-native-reanimated
 jest.mock('react-native-reanimated', () => {
   const Reanimated = require('react-native-reanimated/mock')
