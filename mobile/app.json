@@ -11,6 +11,9 @@
     "sdkVersion": "54.0.0",
     "scheme": "vistafi",
     "main": "expo-router/entry",
+    "android": {
+      "package": "com.adrayandaleandrew.vistafi"
+    },
     "extra": {
       "eas": {
         "projectId": "3141ad15-be00-4e4a-9bee-35c30e01d01f"
