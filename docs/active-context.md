@@ -51,12 +51,12 @@ eas login
 eas whoami
 ```
 
-### C. Set EAS Secrets (from `mobile/` directory)
+### C. Set EAS Environment Variables (from `mobile/` directory)
 ```bash
 cd mobile
-eas secret:create --scope project --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co"
-eas secret:create --scope project --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "eyJhbGc...YOUR_ANON_KEY"
-eas secret:list
+eas env:create preview --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co" --visibility sensitive --scope project
+eas env:create preview --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "eyJhbGc...YOUR_ANON_KEY" --visibility sensitive --scope project
+eas env:list preview   # verify both appear
 ```
 
 ### D. Trigger the APK build
