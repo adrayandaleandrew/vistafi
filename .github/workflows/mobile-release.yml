@@ -1,0 +1,113 @@
+name: Mobile Release — APK Build & Publish
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+# Lock down all permissions at workflow level.
+# Each job below grants only the minimum it needs.
+permissions: {}
+
+jobs:
+  # ── Gate ─────────────────────────────────────────────────────────────────
+  # Run type-check and unit tests before spending EAS build minutes.
+  test:
+    name: Mobile · Type-Check · Unit Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      # Needed locally so supabase.ts can call createClient() at module load.
+      # These are the public anon key + URL — NOT the service_role key.
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci --legacy-peer-deps
+      - name: Type Check
+        run: npm run type-check
+      - name: Unit Tests
+        run: npm run test:ci
+
+  # ── Build & Release ───────────────────────────────────────────────────────
+  # Trigger an EAS preview build, download the APK, publish a GitHub Release.
+  build-and-release:
+    name: EAS Build · Preview APK · GitHub Release
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # Required only for creating GitHub Releases
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci --legacy-peer-deps
+
+      - name: Install EAS CLI
+        # Install globally so `eas` is on PATH for subsequent steps.
+        run: npm install -g eas-cli
+
+      - name: Build Preview APK via EAS
+        id: eas_build
+        # Supabase env vars are NOT passed here.
+        # EAS fetches them from its own "preview" environment
+        # (configured via `eas env:create` and linked in eas.json).
+        timeout-minutes: 45
+        run: |
+          BUILD_JSON=$(eas build \
+            --profile preview \
+            --platform android \
+            --non-interactive \
+            --json \
+            --wait)
+
+          APK_URL=$(echo "$BUILD_JSON" | jq -r '.[0].artifacts.applicationArchiveUrl')
+
+          if [ -z "$APK_URL" ] || [ "$APK_URL" = "null" ]; then
+            echo "::error::APK download URL not found in EAS build output."
+            echo "Full EAS output:"
+            echo "$BUILD_JSON" | jq .
+            exit 1
+          fi
+
+          echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
+        env:
+          EXPO_TOKEN: ${{ secrets.EAS_TOKEN }}
+
+      - name: Download APK from EAS
+        run: curl -fsSL -o vistafi-preview.apk "${{ steps.eas_build.outputs.apk_url }}"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # working-directory default applies to `run` steps only.
+          # This action runs from workspace root, so path includes mobile/.
+          files: mobile/vistafi-preview.apk
+          name: "VistaFi ${{ github.ref_name }}"
+          body: |
+            ## Android Preview Build — ${{ github.ref_name }}
+
+            Internal APK built via EAS (preview profile, `distribution: internal`).
+
+            **Install on Android:**
+            1. Enable *Install from unknown sources* in your device settings
+            2. Download `vistafi-preview.apk` below
+            3. Open the file and tap Install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
