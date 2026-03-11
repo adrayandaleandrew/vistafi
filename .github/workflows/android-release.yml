@@ -1,0 +1,121 @@
+name: Android APK Release
+
+# Triggers:
+#   - Push of a semver tag (v1.0.0, v1.2.3, …) → creates a real GitHub Release
+#   - workflow_dispatch → manual run (useful for testing the pipeline; creates a pre-release)
+#
+# Security notes (see docs/SecurityGuide.md §11):
+#   - actions/checkout pinned to a full commit SHA to prevent supply-chain attacks
+#   - Only EAS_TOKEN is needed here; Supabase keys live in the EAS "preview" environment,
+#     not in GitHub Actions secrets — they are never embedded in this file or the APK binary
+#   - permissions: contents: write only — minimum required to create GitHub Releases
+#   - pull_request is intentionally NOT a trigger — prevents fork PRs from accessing EAS_TOKEN
+#   - Android keystore is managed by EAS cloud — no local .jks / .keystore files exist
+#   - APK is downloaded to the runner's /tmp/ — it is never committed to the repository
+#
+# Required secret: EAS_TOKEN
+#   GitHub → repo → Settings → Secrets and variables → Actions → New repository secret
+#   Get your token from expo.dev → Account → Access Tokens
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # required to create GitHub Releases and upload release assets
+
+jobs:
+  build-and-release:
+    name: EAS Build · Android APK · GitHub Release
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Checkout repository
+        # Pinned to commit SHA — see SecurityGuide.md §11 (supply-chain protection)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Set up Node 20
+        # TODO: pin to commit SHA for maximum supply-chain protection (SecurityGuide §11)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli@latest
+
+      - name: Build Android APK via EAS (preview profile)
+        # --non-interactive: no prompts (required in CI)
+        # --wait: block until the cloud build finishes before continuing
+        # Supabase env vars (EXPO_PUBLIC_SUPABASE_*) are injected by EAS from the
+        # "preview" environment configured in the EAS dashboard — they are never
+        # passed through GitHub Actions and are not present in this file.
+        env:
+          EXPO_TOKEN: ${{ secrets.EAS_TOKEN }}
+        run: |
+          eas build \
+            --platform android \
+            --profile preview \
+            --non-interactive \
+            --wait
+
+      - name: Retrieve APK download URL
+        id: apk-url
+        env:
+          EXPO_TOKEN: ${{ secrets.EAS_TOKEN }}
+        run: |
+          DOWNLOAD_URL=$(eas build:list \
+            --platform android \
+            --status FINISHED \
+            --limit 1 \
+            --non-interactive \
+            --json \
+            | jq -r '.[0].artifacts.buildUrl')
+
+          if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" = "null" ]; then
+            echo "ERROR: Could not retrieve APK download URL from EAS." >&2
+            exit 1
+          fi
+
+          echo "download_url=$DOWNLOAD_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Download APK to runner temp directory
+        run: |
+          APK_NAME="vistafi-${{ github.ref_name }}.apk"
+          curl -L --fail \
+            "${{ steps.apk-url.outputs.download_url }}" \
+            -o "/tmp/$APK_NAME"
+          echo "APK downloaded: /tmp/$APK_NAME"
+          ls -lh "/tmp/$APK_NAME"
+
+      - name: Create GitHub Release and attach APK
+        # TODO: pin to commit SHA for maximum supply-chain protection (SecurityGuide §11)
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "VistaFi ${{ github.ref_name }}"
+          tag_name: ${{ github.ref_name }}
+          body: |
+            ## VistaFi ${{ github.ref_name }}
+
+            Android preview APK — built via EAS Build (preview profile, internal distribution).
+            Supabase backend: production environment.
+
+            ### How to Install
+            1. Download `vistafi-${{ github.ref_name }}.apk` from the assets below
+            2. Transfer to your Android device
+            3. On the device: **Settings → Security → Install unknown apps** → enable for your file manager or browser
+            4. Open the APK file and tap **Install**
+
+            > **Note:** This is a preview/internal build. It is not distributed through the Play Store.
+          files: /tmp/vistafi-${{ github.ref_name }}.apk
+          draft: false
+          prerelease: ${{ github.event_name == 'workflow_dispatch' }}

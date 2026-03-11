@@ -1,13 +1,13 @@
-# Active Context — chore/apk-build: APK Build via EAS Build
+# Active Context — chore/android-apk-release: Automated APK Build → GitHub Releases
 
 ## Context
 
-The VistaFi mobile app (Expo SDK 54, React Native 0.81.5) needs a distributable Android APK
-for sideloading / device testing. EAS Build is already configured — `mobile/eas.json` has a
-`preview` profile with `"buildType": "apk"` and `app.json` already has a registered EAS
-projectId. Two code changes are needed before triggering the build.
+Automate the Android APK build via EAS and publish the artifact to GitHub Releases on every
+semver tag push (`v*.*.*`). EAS `eas.json` already has a `preview` profile with
+`"buildType": "apk"` and `"environment": "preview"` — Supabase keys are managed there, not
+in GitHub Actions secrets. Only `EAS_TOKEN` is needed in the workflow.
 
-Branch: `chore/apk-build`
+Branch: `chore/android-apk-release`
 
 ---
 
@@ -16,61 +16,63 @@ Branch: `chore/apk-build`
 | # | Task | Status |
 |---|------|--------|
 | 1 | Update `docs/active-context.md` | ✅ |
-| 2 | Add signing artifact patterns to `.gitignore` | ✅ |
-| 3 | Add `android.package` to `mobile/app.json` | ✅ |
-| 4 | Security checklist (pre-push) | ✅ |
-| 5 | Commit + push | ✅ |
+| 2 | Create `.github/workflows/android-release.yml` | ✅ |
+| 3 | Update `.gitignore` — add `*.apk`, `*.ipa`, `*.aab`, signing artifact entries | ✅ |
+| 4 | Commit `mobile/.env.local.example` (placeholder-only template) | ✅ |
+| 5 | Security checklist (pre-push) | ✅ |
+| 6 | Commit + push | ✅ |
 
 ---
 
 ## Files Changed
 
-- `.gitignore` — added `*.jks`, `*.keystore`, `*.p12`, `*.cer`, `*.mobileprovision`
-- `mobile/app.json` — added `"android": { "package": "com.adrayandaleandrew.vistafi" }`
+- `.github/workflows/android-release.yml` — new workflow (tag-triggered EAS build + release)
+- `.gitignore` — added `*.apk`, `*.ipa`, `*.aab`, `google-services.json`, `GoogleService-Info.plist`
 - `docs/active-context.md` — this file
+- `mobile/.env.local.example` — committed (placeholder-only, safe)
 
 ## Files NOT Changed
 
-- `mobile/eas.json` — `preview` profile already has `"buildType": "apk"`
-- All source `.tsx`/`.ts` — no code changes needed for a build config task
-- `.github/workflows/mobile-ci.yml` — CI-triggered EAS build is a future step (Phase 12c)
+- `mobile/eas.json` — `preview` profile already correct
+- `mobile/app.json` — EAS projectId + android package already set
+- All source `.tsx`/`.ts` — no code changes needed
 
 ---
 
-## User Actions Required (run manually in terminal)
+## Security Decisions
 
-### A. Install EAS CLI (once globally)
+- `EAS_TOKEN` only in workflow — Supabase keys in EAS "preview" environment, not CI
+- `actions/checkout` pinned to commit SHA (SecurityGuide §11)
+- `permissions: contents: write` only (minimum for GitHub Releases)
+- Trigger on tag push (`v*.*.*`) + `workflow_dispatch` — NOT on `pull_request` (prevents fork exposure)
+- APK downloaded to runner `/tmp/` — never touches git tree
+- Keystore managed by EAS cloud — no local signing artifacts
+- `*.apk`, `*.ipa`, `*.aab` added to `.gitignore`
+
+---
+
+## User Actions Required Before First Run
+
+### 1. Add `EAS_TOKEN` to GitHub Secrets
+GitHub → repo → Settings → Secrets and variables → Actions → New repository secret:
+- Name: `EAS_TOKEN`
+- Value: your Expo access token from expo.dev → Account → Access Tokens
+
+### 2. Verify EAS Environment Variables Are Set
+From `mobile/` directory:
 ```bash
-npm install -g eas-cli
-eas --version   # must be >= 5.0.0
+eas env:list preview
+```
+Both `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` must appear.
+If not, create them (from previous chore/apk-build):
+```bash
+eas env:create preview --name EXPO_PUBLIC_SUPABASE_URL --value "https://..." --visibility sensitive --scope project
+eas env:create preview --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "eyJhbGc..." --visibility sensitive --scope project
 ```
 
-### B. Log in to Expo
+### 3. Trigger a Release
 ```bash
-eas login
-eas whoami
+git tag v1.0.0
+git push origin v1.0.0
 ```
-
-### C. Set EAS Environment Variables (from `mobile/` directory)
-```bash
-cd mobile
-eas env:create preview --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co" --visibility sensitive --scope project
-eas env:create preview --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "eyJhbGc...YOUR_ANON_KEY" --visibility sensitive --scope project
-eas env:list preview   # verify both appear
-```
-
-### D. Trigger the APK build
-```bash
-cd mobile
-eas build --platform android --profile preview
-# Answer "Yes" to keystore generation on first run
-```
-
-### E. Download the APK
-- expo.dev → Projects → vistafi → Builds → completed build → Download
-- Or: `eas build:list --platform android --limit 3`
-
-### F. Install on Android device
-1. Transfer `.apk` to device
-2. Settings → Security → Install Unknown Apps → enable
-3. Open `.apk` → Install
+GitHub Actions runs → EAS builds APK → GitHub Release created with APK attached.
