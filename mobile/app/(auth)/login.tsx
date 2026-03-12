@@ -38,7 +38,7 @@ export default function LoginScreen() {
   }))
 
   const triggerBiometric = async () => {
-    const result = await LocalAuthentication.authenticate({
+    const result = await LocalAuthentication.authenticateAsync({
       promptMessage: 'Sign in to VistaFi',
     })
     if (result.success) {
