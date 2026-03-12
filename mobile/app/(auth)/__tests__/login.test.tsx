@@ -40,7 +40,7 @@ jest.mock('react-native-reanimated', () => {
 jest.mock('expo-local-authentication', () => ({
   hasHardwareAsync: jest.fn().mockResolvedValue(false),
   isEnrolledAsync: jest.fn().mockResolvedValue(false),
-  authenticate: jest.fn(),
+  authenticateAsync: jest.fn(),
 }))
 
 // Mock AsyncStorage — pref off by default → showForm=true
@@ -64,7 +64,7 @@ import { supabase } from '../../../src/lib/supabase'
 
 const mockHasHardware = LocalAuthentication.hasHardwareAsync as jest.Mock
 const mockIsEnrolled = LocalAuthentication.isEnrolledAsync as jest.Mock
-const mockAuthenticate = LocalAuthentication.authenticate as jest.Mock
+const mockAuthenticate = LocalAuthentication.authenticateAsync as jest.Mock
 const mockGetItem = AsyncStorage.getItem as jest.Mock
 const mockGetSession = supabase.auth.getSession as jest.Mock
 
