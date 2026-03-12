@@ -31,7 +31,7 @@ export function useAddItem(userId: string) {
   }, [queryClient, queryKey])
 
   return useMutation({
-    mutationFn: addItem,
+    mutationFn: (newItem: Omit<BudgetItem, 'id'>) => addItem(userId, newItem),
     onMutate,
     onError,
     onSettled,

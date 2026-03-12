@@ -46,7 +46,7 @@ describe('useAddItem', () => {
     // When
     act(() => { result.current.mutate(newItemInput) })
     // Then
-    await waitFor(() => expect(mockAddItem).toHaveBeenCalledWith(newItemInput))
+    await waitFor(() => expect(mockAddItem).toHaveBeenCalledWith('user-123', newItemInput))
   })
 
   test('2. optimistic update: cache updated before server confirms', async () => {

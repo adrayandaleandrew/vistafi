@@ -12,16 +12,17 @@ export async function fetchItems(): Promise<BudgetItem[]> {
 }
 
 export async function addItem(
+  userId: string,
   item: Omit<BudgetItem, 'id'>
 ): Promise<BudgetItem> {
   const { data, error } = await supabase
     .from('budget_items')
-    .insert(item)
+    .insert({ ...item, user_id: userId })
     .select()
     .single()
 
   if (error) throw error
-  return data
+  return data as BudgetItem
 }
 
 export async function updateItem(item: BudgetItem): Promise<BudgetItem> {
